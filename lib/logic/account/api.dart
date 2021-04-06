@@ -4,7 +4,7 @@ class LoginApi extends ApiBase {
   final String accountName;
   LoginApi({this.accountName});
 
-  Future<Response> start() => dio.post("/login", data: {
+  Future<Response> start() => dio.post("/login", data: FormData.fromMap({
     "account_name": accountName
-  });
+  }));
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:xiao_yu_ji_zhang/logic/account/manager.dart';
 import 'package:xiao_yu_ji_zhang/ui/selected_bar.dart';
 import 'package:xiao_yu_ji_zhang/page/main/chart.dart';
 import 'package:xiao_yu_ji_zhang/ui/ui.dart';
@@ -59,6 +60,10 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.close),
+        onPressed: AccountManager.instance.logout,
+      ),
         appBar: AppBar(
             elevation: 0,
             backgroundColor: AlternativeColors.basicColor,

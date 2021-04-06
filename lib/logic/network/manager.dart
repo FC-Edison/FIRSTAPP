@@ -1,3 +1,5 @@
+import 'package:xiao_yu_ji_zhang/logic/account/manager.dart';
+
 class NetworkManager {
   static NetworkManager _instance;
 
@@ -11,6 +13,5 @@ class NetworkManager {
 
   String baseURL = "http://192.168.3.51:80/";
 
-  // TODO 补上accountName
-  Map<String, String> defaultHeader= {"account_name": ""};
+  Map<String, String> defaultHeader= {"account_name": AccountManager.instance.accountName};
 }
