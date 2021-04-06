@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:xiao_yu_ji_zhang/view/main.dart';
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:xiao_yu_ji_zhang/ui/ui.dart';
 
 
-class MainPageTopLine extends StatefulWidget {
+class FirstLine extends StatefulWidget {
   @override
-  _MainPageTopLineState createState() => _MainPageTopLineState();
+  _FirstLineState createState() => _FirstLineState();
 }
 
-class _MainPageTopLineState extends State<MainPageTopLine> {
+class _FirstLineState extends State<FirstLine> {
 
   int currentYear = DateTime.now().year;
   int currentMonth = DateTime.now().month;
@@ -17,7 +17,7 @@ class _MainPageTopLineState extends State<MainPageTopLine> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: XiaoYuApp.BASIC_COLOR,
+      color: AlternativeColors.basicColor,
       height: 70,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -26,14 +26,14 @@ class _MainPageTopLineState extends State<MainPageTopLine> {
           //左边：日期和支出
           Container(
             width: 210,
-            color: XiaoYuApp.BASIC_COLOR,
+            color: AlternativeColors.basicColor,
             child: Row(
               children: [
 
                 //日期
                 Container(
                   width: 90,
-                  color: XiaoYuApp.BASIC_COLOR,
+                  color: AlternativeColors.basicColor,
                   child:TextButton(
                     onPressed: () {
                       Picker(
@@ -93,14 +93,14 @@ class _MainPageTopLineState extends State<MainPageTopLine> {
                 //支出
                 Container(
                   width: 90,
-                  color: XiaoYuApp.BASIC_COLOR,
+                  color: AlternativeColors.basicColor,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         height: 70,
                         width: 60,
-                        color: XiaoYuApp.BASIC_COLOR,
+                        color: AlternativeColors.basicColor,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,14 +123,14 @@ class _MainPageTopLineState extends State<MainPageTopLine> {
           //右边：收入
           Container(
             width: 90,
-            color: XiaoYuApp.BASIC_COLOR,
+            color: AlternativeColors.basicColor,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   height: 70,
                   width: 60,
-                  color: XiaoYuApp.BASIC_COLOR,
+                  color: AlternativeColors.basicColor,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.start,

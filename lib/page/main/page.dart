@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:xiao_yu_ji_zhang/view/main.dart';
-import 'package:xiao_yu_ji_zhang/view/main_page_first_line.dart';
-import 'package:xiao_yu_ji_zhang/view/selected_bar.dart';
+import 'package:xiao_yu_ji_zhang/ui/selected_bar.dart';
+import 'package:xiao_yu_ji_zhang/page/main/chart.dart';
+import 'package:xiao_yu_ji_zhang/ui/ui.dart';
+import 'package:xiao_yu_ji_zhang/page/keep_accounts/make_notes.dart';
+import 'first_line.dart';
 
 class MainPage extends StatefulWidget {
-  static int selectedTable = 1;
 
   @override
   _MainPageState createState() => _MainPageState();
@@ -60,7 +61,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
         appBar: AppBar(
             elevation: 0,
-            backgroundColor: XiaoYuApp.BASIC_COLOR,
+            backgroundColor: AlternativeColors.basicColor,
             title: Center(
               child: Text('记账本'),
             )),
@@ -73,15 +74,19 @@ class _MainPageState extends State<MainPage> {
               itemBuilder: (BuildContext context, int index) {
                 //日期支出收入行
                 if (index == 0) {
-                  return MainPageTopLine();
+                  return FirstLine();
                 }
-
                 //明细报表行
                 else if (index == 1)
                   return SelectedBar(
                     currentIndex: selectBarCurrentIndex,
                     items: selectBarItems,
                     onSelectedItemChange: onSelectBarItemChange,
+                    height: 40,
+                    borderColor: AlternativeColors.basicColor,
+                    selectedColor: AlternativeColors.basicColor,
+                    unselectedColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 6,horizontal: 10),
                   );
 
                 if (selectBarCurrentIndex == 0) {
@@ -92,7 +97,13 @@ class _MainPageState extends State<MainPage> {
                         backgroundColor:
                             MaterialStateProperty.all(Colors.white),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MakeNotes())
+                        );
+                      },
                       child: Container(
                           height: 80,
                           child: Row(
@@ -130,7 +141,7 @@ class _MainPageState extends State<MainPage> {
                     height: 80,
                   );
                 } else {
-                  return Container();
+                  return ChartPage();
                 }
               },
               separatorBuilder: (BuildContext context, int index) =>
@@ -146,7 +157,13 @@ class _MainPageState extends State<MainPage> {
                         width: 1, color: Color.fromARGB(255, 200, 200, 200)))
                     // elevation: MaterialStateProperty.all(3)
                     ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MakeNotes())
+                      );
+                },
                 child: Container(
                   height: 50,
                   width: 400,
@@ -156,12 +173,12 @@ class _MainPageState extends State<MainPage> {
                     children: [
                       Icon(
                         Icons.add,
-                        color: XiaoYuApp.BASIC_COLOR,
+                        color: AlternativeColors.basicColor,
                         size: 30,
                       ),
                       Text('记一笔',
                           style: TextStyle(
-                              color: XiaoYuApp.BASIC_COLOR, fontSize: 17)),
+                              color: AlternativeColors.basicColor, fontSize: 17)),
                     ],
                   )),
                 ))

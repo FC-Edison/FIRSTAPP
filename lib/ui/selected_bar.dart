@@ -1,23 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:xiao_yu_ji_zhang/view/main.dart';
+
 class SelectedBar extends StatelessWidget {
   final int currentIndex;
   final void Function(int) onSelectedItemChange;
   final List<String> items;
+  final double height;
+  final Color borderColor;
+  final Color selectedColor;
+  final EdgeInsetsGeometry padding;
+  final Color unselectedColor;
 
-  SelectedBar({this.currentIndex,this.items,this.onSelectedItemChange});
+  SelectedBar({this.currentIndex,this.items,this.onSelectedItemChange,this.height, this.borderColor, this.selectedColor, this.padding, this.unselectedColor});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
+      height: height,
       child: CupertinoSegmentedControl(
-        padding: EdgeInsets.symmetric(vertical: 6,horizontal: 10),
+        padding: padding,
         groupValue:currentIndex,
-        borderColor: XiaoYuApp.BASIC_COLOR,
+        borderColor: borderColor,
         onValueChanged: onSelectedItemChange,
-        selectedColor: XiaoYuApp.BASIC_COLOR,
+        selectedColor: selectedColor,
+        unselectedColor: unselectedColor,
         children: Map.fromIterable(items,key: (item) => items.indexOf(item), value: (item) => Text(item)),
       ),
     );
