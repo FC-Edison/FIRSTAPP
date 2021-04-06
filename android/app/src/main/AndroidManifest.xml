@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.xiao_yu_ji_zhang">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="xiao_yu_ji_zhang"
+       android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
