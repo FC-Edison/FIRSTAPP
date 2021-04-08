@@ -21,7 +21,6 @@ class SelectedButton extends StatelessWidget {
                   width: 44,
                   height: 44,
                   margin: EdgeInsets.only(bottom: 4),
-
                   decoration: BoxDecoration(
                       color: isSelected?AlternativeColors.basicColor:Colors.white,
                       border: Border.all(
@@ -35,8 +34,7 @@ class SelectedButton extends StatelessWidget {
                       width: 22,
                     ),
                   )),
-              Text('餐饮',
-                  style: TextStyle(fontSize: 12, color: isSelected?AlternativeColors.basicColor:Colors.black),
+              Text('餐饮', style: TextStyle(fontSize: 12, color: isSelected ? AlternativeColors.basicColor:Colors.black),
               )
             ]),
       ),

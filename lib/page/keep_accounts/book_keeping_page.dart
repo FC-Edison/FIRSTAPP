@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_picker/Picker.dart';
+
+import 'package:xiao_yu_ji_zhang/logic/account/manager.dart';
+import 'package:xiao_yu_ji_zhang/logic/money/manager.dart';
+import 'package:xiao_yu_ji_zhang/ui/custom_settings/custom_data.dart';
 import 'package:xiao_yu_ji_zhang/ui/selected_bar.dart';
 import 'package:xiao_yu_ji_zhang/page/keep_accounts/selected_button.dart';
 import 'package:xiao_yu_ji_zhang/ui/ui.dart';
 
-class MakeNotes extends StatefulWidget {
+class BookKeepingPage extends StatefulWidget {
   @override
-  _MakeNotesState createState() => _MakeNotesState();
+  _BookKeepingPageState createState() => _BookKeepingPageState();
 }
 
-class _MakeNotesState extends State<MakeNotes> {
+class _BookKeepingPageState extends State<BookKeepingPage> {
+
+  int currentYear = DateTime.now().year;
+  int currentMonth = DateTime.now().month;
+  int currentDay = DateTime.now().day;
+
   final List<String> entries = <String>[
     'A',
     'B',
@@ -17,12 +28,16 @@ class _MakeNotesState extends State<MakeNotes> {
     'B',
     'C',
   ];
+
   int buttonSelectedIndex;
 
   int selectBarCurrentIndex = 0;
   List<String> selectBarItems = ["支出", "收入"];
 
   ScrollController _scrollController;
+
+  final amountController = TextEditingController();
+  final remarkController = TextEditingController();
 
   @override
   void initState() {
@@ -35,6 +50,23 @@ class _MakeNotesState extends State<MakeNotes> {
     setState(() {
       selectBarCurrentIndex = index;
     });
+  }
+
+  Future<bool> save() async {
+    if(double.tryParse(amountController.text) == null){
+      BotToast.showText(text: "金额输入有误！");
+      amountController.clear();
+      return false;
+    }else{
+      var response = await MoneyManager.instance.bookKeeping(DateTime(currentYear, currentMonth, currentDay).microsecondsSinceEpoch, double.parse(amountController.text), "餐饮", remarkController.text);
+      if(response["success"]){
+        BotToast.showText(text: "保存成功");
+        return true;
+      }else{
+        BotToast.showText(text: response["message"]);
+        return false;
+      }
+    }
   }
 
   @override
@@ -73,8 +105,7 @@ class _MakeNotesState extends State<MakeNotes> {
                       children: [
                         Container(
                           color: Colors.white,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -83,8 +114,29 @@ class _MakeNotesState extends State<MakeNotes> {
                                 child: SizedBox(
                                   height: 30,
                                   child: OutlinedButton(
-                                    onPressed: () {},
-                                    child: Text("4月5日"),
+                                    onPressed: () {
+                                      Picker(
+                                          confirmText: "确认",
+                                          cancelText: "取消",
+                                          confirmTextStyle: TextStyle(fontSize: 18),
+                                          cancelTextStyle: TextStyle(fontSize:18,color: Colors.grey),
+                                          adapter:DateTimePickerAdapter(
+                                            months: CustomData.months,
+                                            yearBegin: 2018,
+                                              yearEnd: 2022,
+                                              value: DateTime(currentYear, currentMonth, currentDay),
+                                              type: PickerDateTimeType.kYMD
+                                          ),
+                                          onConfirm: (Picker picker, List value) {
+                                            setState(() {
+                                              currentYear = 2018 + value[0];
+                                              currentMonth = value[1] + 1;
+                                              currentDay = value[2] + 1;
+                                            });
+                                          }
+                                      ).showModal(this.context);
+                                    },
+                                    child: Text('$currentMonth月$currentDay日',style: TextStyle(color: Colors.black54,fontSize: 14),)
                                   ),
                                 ),
                               ),
@@ -96,11 +148,15 @@ class _MakeNotesState extends State<MakeNotes> {
                                   flex: 15,
                                   child: SizedBox(
                                     height: 30,
-                                    child: TextField(
+                                    child: TextFormField(
+                                      controller: amountController,
+                                      keyboardType: TextInputType.number,
+                                      // controller: amountController,
                                       decoration: InputDecoration(
+                                          labelStyle: TextStyle(fontSize: 14),
                                           labelText: "￥0.00",
                                           floatingLabelBehavior:
-                                              FloatingLabelBehavior.never,
+                                          FloatingLabelBehavior.never,
                                           border: OutlineInputBorder()),
                                     ),
                                   ))
@@ -132,9 +188,11 @@ class _MakeNotesState extends State<MakeNotes> {
                                 horizontal: 10, vertical: 8),
                             child: SizedBox(
                               height: 30,
-                              child: TextField(
+                              child: TextFormField(
+                                controller: remarkController,
                                 decoration: InputDecoration(
-                                    labelText: "￥0.00",
+                                  labelStyle: TextStyle(fontSize: 14),
+                                    labelText: "备注：",
                                     floatingLabelBehavior:
                                         FloatingLabelBehavior.never,
                                     border: OutlineInputBorder()),
@@ -151,14 +209,21 @@ class _MakeNotesState extends State<MakeNotes> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
-                            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white),minimumSize: MaterialStateProperty.all(Size(160,40))),
-                            onPressed: () {},
+                              style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white),minimumSize: MaterialStateProperty.all(Size(160,40))),
+                              onPressed: () async {
+                              if(await save()){
+                                amountController.clear();
+                                remarkController.clear();
+                              }
+                            },
                             child: Text('保存再记', style: TextStyle(color: AlternativeColors.basicColor),),
                           ),
                           ElevatedButton(
                               style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AlternativeColors.basicColor),minimumSize: MaterialStateProperty.all(Size(160,40))),
-                              onPressed: () {
-                                Navigator.pop(context);
+                              onPressed: () async {
+                                if(await save()){
+                                  Get.back();
+                                }
                               },
                               child:
                                   Text('保存')),

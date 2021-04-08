@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:xiao_yu_ji_zhang/logic/account/manager.dart';
+import 'package:xiao_yu_ji_zhang/logic/money/manager.dart';
 import 'package:xiao_yu_ji_zhang/ui/selected_bar.dart';
 import 'package:xiao_yu_ji_zhang/page/main/chart.dart';
 import 'package:xiao_yu_ji_zhang/ui/ui.dart';
-import 'package:xiao_yu_ji_zhang/page/keep_accounts/make_notes.dart';
+import 'package:xiao_yu_ji_zhang/page/keep_accounts/book_keeping_page.dart';
 import 'first_line.dart';
 
 class MainPage extends StatefulWidget {
-
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -60,10 +60,10 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.close),
-        onPressed: AccountManager.instance.logout,
-      ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.close),
+          onPressed: AccountManager.instance.logout,
+        ),
         appBar: AppBar(
             elevation: 0,
             backgroundColor: AlternativeColors.basicColor,
@@ -91,7 +91,7 @@ class _MainPageState extends State<MainPage> {
                     borderColor: AlternativeColors.basicColor,
                     selectedColor: AlternativeColors.basicColor,
                     unselectedColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 6,horizontal: 10),
+                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                   );
 
                 if (selectBarCurrentIndex == 0) {
@@ -103,11 +103,7 @@ class _MainPageState extends State<MainPage> {
                             MaterialStateProperty.all(Colors.white),
                       ),
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MakeNotes())
-                        );
+                        Get.to(() => BookKeepingPage());
                       },
                       child: Container(
                           height: 80,
@@ -166,25 +162,23 @@ class _MainPageState extends State<MainPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MakeNotes())
-                      );
+                          builder: (context) => BookKeepingPage()));
                 },
                 child: Container(
                   height: 50,
                   width: 400,
                   child: Center(
                       child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        color: AlternativeColors.basicColor,
-                        size: 30,
-                      ),
-                      Text('记一笔',
-                          style: TextStyle(
-                              color: AlternativeColors.basicColor, fontSize: 17)),
-                    ],
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                        Icon(
+                          Icons.add,
+                          color: AlternativeColors.basicColor,
+                          size: 30,
+                        ),
+                        Text('记一笔',
+                          style: TextStyle(color: AlternativeColors.basicColor, fontSize: 17)),
+                        ],
                   )),
                 ))
           ],

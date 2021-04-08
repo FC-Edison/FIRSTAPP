@@ -13,5 +13,5 @@ class NetworkManager {
 
   String baseURL = "http://192.168.3.51:80/";
 
-  Map<String, String> defaultHeader= {"account_name": AccountManager.instance.accountName};
+  Map<String, String> get defaultHeader => {"account_name": AccountManager.instance.accountName};
 }
