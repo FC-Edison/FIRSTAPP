@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_picker/Picker.dart';
-
-import 'package:xiao_yu_ji_zhang/logic/account/manager.dart';
+import 'package:xiao_yu_ji_zhang/logic/app/config/bookkeeping_button_config.dart';
+import 'package:xiao_yu_ji_zhang/logic/app/config/manager.dart';
 import 'package:xiao_yu_ji_zhang/logic/money/manager.dart';
 import 'package:xiao_yu_ji_zhang/ui/custom_settings/custom_data.dart';
 import 'package:xiao_yu_ji_zhang/ui/selected_bar.dart';
@@ -15,25 +15,17 @@ class BookKeepingPage extends StatefulWidget {
 }
 
 class _BookKeepingPageState extends State<BookKeepingPage> {
-
+//日期时间变量
   int currentYear = DateTime.now().year;
   int currentMonth = DateTime.now().month;
   int currentDay = DateTime.now().day;
-
-  final List<String> entries = <String>[
-    'A',
-    'B',
-    'C',
-    'A',
-    'B',
-    'C',
-  ];
-
+//按钮Icon选项索引变量
   int buttonSelectedIndex;
-
+//选择条选项索引变量
   int selectBarCurrentIndex = 0;
+  //选择条选项
   List<String> selectBarItems = ["支出", "收入"];
-
+//
   ScrollController _scrollController;
 
   final amountController = TextEditingController();
@@ -46,19 +38,23 @@ class _BookKeepingPageState extends State<BookKeepingPage> {
     super.initState();
   }
 
+//决定输出按钮的Icon是支出按钮Icon还是收入按钮Icon
+  BookKeepingButtonConfig get currentConfig => selectBarCurrentIndex == 0 ? AppConfigManager.instance.outcomeConfig : AppConfigManager.instance.incomeConfig;
+
   void onSelectBarItemChange(int index) {
     setState(() {
       selectBarCurrentIndex = index;
     });
   }
-
+  //按钮选择的逻辑
+  String selectedType;
   Future<bool> save() async {
     if(double.tryParse(amountController.text) == null){
       BotToast.showText(text: "金额输入有误！");
       amountController.clear();
       return false;
     }else{
-      var response = await MoneyManager.instance.bookKeeping(DateTime(currentYear, currentMonth, currentDay).microsecondsSinceEpoch, double.parse(amountController.text), "餐饮", remarkController.text);
+      var response = await (selectBarCurrentIndex == 0 ? MoneyManager.instance.outcome(DateTime(currentYear, currentMonth, currentDay).microsecondsSinceEpoch, double.parse(amountController.text), selectedType, remarkController.text) : MoneyManager.instance.income(DateTime(currentYear, currentMonth, currentDay).microsecondsSinceEpoch, double.parse(amountController.text), selectedType, remarkController.text));
       if(response["success"]){
         BotToast.showText(text: "保存成功");
         return true;
@@ -165,17 +161,21 @@ class _BookKeepingPageState extends State<BookKeepingPage> {
                         ),
                         Container(
                             color: Colors.white,
-                            height: 170,
+                            height: ((currentConfig.bookKeepingButtonConfig.length) / 5) * 85,
                             child: GridView.count(
                                 primary: false,
                                 padding: const EdgeInsets.all(10),
                                 crossAxisSpacing: 10,
                                 mainAxisSpacing: 10,
                                 crossAxisCount: 5,
-                                children: List.generate(10,
+                                children: List.generate(currentConfig.bookKeepingButtonConfig.length,
                                     (index) => SelectedButton(
+                                      icon: currentConfig.bookKeepingButtonConfig[index].icon,
+                                      iconSel: currentConfig.bookKeepingButtonConfig[index].iconSel,
+                                      type: currentConfig.bookKeepingButtonConfig[index].type,
                                       isSelected: buttonSelectedIndex == index,
                                       onTap: () {
+                                        selectedType = AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig[index].type;
                                         FocusScope.of(context).requestFocus(FocusNode());
                                         setState(() {
                                           buttonSelectedIndex = index;

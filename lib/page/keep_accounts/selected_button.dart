@@ -4,8 +4,18 @@ import 'package:xiao_yu_ji_zhang/ui/ui.dart';
 class SelectedButton extends StatelessWidget {
   final bool isSelected;
   final Function onTap;
+  final String icon;
+  final String iconSel;
+  final String type;
 
-  const SelectedButton({Key key, this.isSelected = false, this.onTap}) : super(key: key);
+  const SelectedButton(
+      {Key key,
+      this.isSelected = false,
+      this.onTap,
+      this.icon,
+      this.iconSel,
+      this.type})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,19 +32,25 @@ class SelectedButton extends StatelessWidget {
                   height: 44,
                   margin: EdgeInsets.only(bottom: 4),
                   decoration: BoxDecoration(
-                      color: isSelected?AlternativeColors.basicColor:Colors.white,
+                      color: isSelected
+                          ? AlternativeColors.basicColor
+                          : Colors.white,
                       border: Border.all(
                           width: 1,
-                          color: isSelected?AlternativeColors.basicColor:Colors.black),
-                      borderRadius:
-                      BorderRadius.all(
-                          Radius.circular(22))),
+                          color: isSelected
+                              ? AlternativeColors.basicColor
+                              : Colors.black),
+                      borderRadius: BorderRadius.all(Radius.circular(22))),
                   child: Center(
-                    child: Image.asset(isSelected?'images/whitecanyin.png':'images/canyin.png',
-                      width: 22,
-                    ),
+                    child: Image.network(isSelected ? iconSel : icon,width: 22,),
                   )),
-              Text('餐饮', style: TextStyle(fontSize: 12, color: isSelected ? AlternativeColors.basicColor:Colors.black),
+              Text(
+                type,
+                style: TextStyle(
+                    fontSize: 12,
+                    color: isSelected
+                        ? AlternativeColors.basicColor
+                        : Colors.black),
               )
             ]),
       ),

@@ -68,7 +68,8 @@ class _FirstLineState extends State<FirstLine> {
                           TextSpan(text: "月",style: TextStyle(fontSize: 13)),
                         ])),
                         Container(
-                          width: 22,
+                          margin: EdgeInsets.all(2),
+                          width: 20,
                           alignment: Alignment.topLeft,
                           child: Container(
                             width: 7,
