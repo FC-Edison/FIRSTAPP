@@ -1,20 +1,38 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
-import 'package:xiao_yu_ji_zhang/ui/custom_settings/custom_data.dart';
+import 'package:xiao_yu_ji_zhang/logic/book_keeping/controller.dart';
+import 'package:xiao_yu_ji_zhang/logic/book_keeping/manager.dart';
 import 'package:xiao_yu_ji_zhang/ui/ui.dart';
 
 class FirstLine extends StatefulWidget {
+
+  DateTime timeTo;
+  FirstLine({Key key, this.timeTo}) : super(key: key);
+
   @override
   _FirstLineState createState() => _FirstLineState();
 }
 
 class _FirstLineState extends State<FirstLine> {
+  final DetailListController detailController = Get.find();
+
   int currentYear = DateTime.now().year;
   int currentMonth = DateTime.now().month;
 
+  DateTime timeTo;
+
+  @override
+  void initState() {
+    timeTo = widget.timeTo;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    //总收入和总支出
+    double outcomeAmount = (detailController.outcomeAmount.toDouble() - detailController.incomeAmount.toDouble()).toPrecision(2);
+    double incomeAmount = detailController.incomeAmount.toDouble().toPrecision(2);
     return Container(
       color: AlternativeColors.basicColor,
       height: 70,
@@ -33,6 +51,7 @@ class _FirstLineState extends State<FirstLine> {
                   color: AlternativeColors.basicColor,
                   child: TextButton(
                     onPressed: () {
+                      widget.timeTo = null;
                       Picker(
                               confirmText: "确认",
                               cancelText: "取消",
@@ -42,27 +61,30 @@ class _FirstLineState extends State<FirstLine> {
                               adapter: DateTimePickerAdapter(
                                 yearBegin: 2018,
                                   yearEnd: 2022,
-                                  months: CustomData.months,
-                                  value: DateTime(currentYear, currentMonth),
+                                  isNumberMonth: true,
+                                  value: DateTime(currentYear, currentMonth) ,
                                   type: PickerDateTimeType.kYM),
                               onConfirm: (Picker picker, List value) {
                                 setState(() {
                                   currentYear = 2018 + value[0];
                                   currentMonth = value[1] + 1;
                                 });
-                              }).showModal(this.context); //_scaffoldKey.currentState);
+                                BookKeepingManager.instance.sync(DateTime(currentYear,currentMonth));
+                              }).showModal(this.context);
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "$currentYear年",
+                          (widget.timeTo) == null ? "$currentYear年" : widget.timeTo.year.toString() + "年",
                           style: TextStyle(color: Colors.white,fontSize: 13),
                         ),
                         RichText(
                             text: TextSpan(children: [
                           TextSpan(
-                            text: currentMonth > 10? "$currentMonth" : "0$currentMonth",
+                            text: currentMonth >= 10? ((widget.timeTo) == null ? "$currentMonth" : widget.timeTo.month.toString()) :
+                            ((widget.timeTo) == null ? "0$currentMonth" : "0" + widget.timeTo.month.toString()),
+                            // "$currentMonth" : "0$currentMonth",
                             style: TextStyle(fontSize: 18),
                           ),
                           TextSpan(text: "月",style: TextStyle(fontSize: 13)),
@@ -116,28 +138,30 @@ class _FirstLineState extends State<FirstLine> {
 
                 //支出
                 Container(
-                  width: 90,
+                  width: 110,
                   color: AlternativeColors.basicColor,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Container(
                         height: 70,
-                        width: 60,
+                        width: 88,
                         color: AlternativeColors.basicColor,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('支出(元)',
+                            Text('支出 (元)',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 14,
                                   color: Colors.white,
                                 )),
                             Text(
-                              '33.0',
+                              '$outcomeAmount',
+                              maxLines: 1,
                               style:
-                                  TextStyle(fontSize: 17, color: Colors.white),
+                                  TextStyle(fontSize: 14, color: Colors.white),
                             )
                           ],
                         ),
@@ -151,33 +175,26 @@ class _FirstLineState extends State<FirstLine> {
 
           //右边：收入
           Container(
-            width: 90,
+            width: 100,
             color: AlternativeColors.basicColor,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 70,
-                  width: 60,
-                  color: AlternativeColors.basicColor,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('收入(元)',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.white,
-                          )),
-                      Text(
-                        '0.0',
-                        style: TextStyle(fontSize: 17, color: Colors.white),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            child: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('收入 (元)',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                      )),
+                  Text(
+                    '$incomeAmount',
+                    maxLines: 1,
+                    style: TextStyle(fontSize: 14, color: Colors.white),
+                  )
+                ],
+              ),
+            )
           )
         ],
       ),

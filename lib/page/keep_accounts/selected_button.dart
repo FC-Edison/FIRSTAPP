@@ -20,7 +20,7 @@ class SelectedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap:onTap,
       child: Container(
         width: 55,
         height: 55,
@@ -50,7 +50,7 @@ class SelectedButton extends StatelessWidget {
                     fontSize: 12,
                     color: isSelected
                         ? AlternativeColors.basicColor
-                        : Colors.black),
+                        : Colors.black54),
               )
             ]),
       ),

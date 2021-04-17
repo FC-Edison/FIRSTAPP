@@ -37,19 +37,28 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("登录"),
+          elevation: 0,
+          backgroundColor: AlternativeColors.basicColor,
+          title: Center(
+            child: Text('登录'),
+          )
       ),
-      body: Center(child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextField(
-            controller: _controller,
-            decoration: InputDecoration(icon: Icon(Icons.account_box_outlined), labelText: "用户名"),
+      body: Center(
+        child: Container(
+          width: 300,
+          child: Column(
+
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: _controller,
+                decoration: InputDecoration(icon: Icon(Icons.account_box_outlined,color: AlternativeColors.basicColor ,size: 40,), labelText: "请输入您的用户名"),
+              ),
+              SizedBox(height: 20,),
+              ElevatedButton(onPressed: login , child: Text("登录"),style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AlternativeColors.basicColor),),)
+            ],
           ),
-          SizedBox(height: 20,),
-          ElevatedButton(onPressed: login , child: Text("登录"))
-        ],
-      ),),
+        )),
     );
   }
 }
