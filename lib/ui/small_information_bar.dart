@@ -45,12 +45,20 @@ class SmallInformationBar extends StatelessWidget {
   }
 
   String get date{
-    int month = DateTime.fromMillisecondsSinceEpoch(cellInforBar[0].timeStamp).month;
-    int day = DateTime.fromMillisecondsSinceEpoch(cellInforBar[0].timeStamp).day;
+    String days;
+    if(DateTime.fromMillisecondsSinceEpoch(cellInforBar[0].timeStamp).day == DateTime.now().day){
+      days = "今天";
+    }else if(DateTime.fromMillisecondsSinceEpoch(cellInforBar[0].timeStamp).day == DateTime.now().day - 1){
+      days = "昨天";
+    }else if(DateTime.fromMillisecondsSinceEpoch(cellInforBar[0].timeStamp).day == DateTime.now().day - 2){
+      days = "前天";
+    }else{
+      int month = DateTime.fromMillisecondsSinceEpoch(cellInforBar[0].timeStamp).month;
+      int day = DateTime.fromMillisecondsSinceEpoch(cellInforBar[0].timeStamp).day;
+      days = (month >= 10 ? month.toString() : "0" + month.toString()) + "-" + (day >= 10 ? day.toString() : "0" + day.toString());
+    }
     String weekday = chineseWeekday(DateTime.fromMillisecondsSinceEpoch(cellInforBar[0].timeStamp).weekday);
-
-    String date = (month >= 10 ? month.toString() : "0" + month.toString()) + "-" + (day >= 10 ? day.toString() : "0" + day.toString()) + " " + (weekday);
-    return date;
+    return days + " " + (weekday);
   }
 
   @override
@@ -66,7 +74,7 @@ class SmallInformationBar extends StatelessWidget {
 
 
 
-          Text(outcomeAmount + "   " + incomeAmount + "   ",style: TextStyle(color: Colors.black54,fontSize: 12)),
+          Text(outcomeAmount + "    " + incomeAmount + "   ",style: TextStyle(color: Colors.black54,fontSize: 12)),
 
         ],
       ),

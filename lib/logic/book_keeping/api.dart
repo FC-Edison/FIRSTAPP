@@ -56,6 +56,13 @@ class DetailListApi extends ApiBase {
   }
 }
 
+class DetailChartApi extends ApiBase {
+
+  Future<Response> start() {
+    return dio.get("/detailed-chart");
+  }
+}
+
 class DeleteRecordApi extends ApiBase {
 
   final bool isOutcome;

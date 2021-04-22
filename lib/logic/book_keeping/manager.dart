@@ -13,7 +13,7 @@ class BookKeepingManager{
   }
   BookKeepingManager._init();
 
-  DetailListController _controller = DetailListController();
+  DetailDataController _controller = DetailDataController();
 
   void initController () {
     Get.put(_controller);
@@ -29,16 +29,18 @@ class BookKeepingManager{
     sync(dateTime);
     return data;
   }
-
+  ///列表数据
   List<DetailListItem> _incomeList, _outcomeList;
-
-
   List<DetailListItem> get incomeList => _incomeList;
-
   List<DetailListItem> get outcomeList => _outcomeList;
 
+  ///图表数据
+  List<DetailChartItem> _incomeChart, _outcomeChart;
+  List<DetailChartItem> get incomeChart => _incomeChart;
+  List<DetailChartItem> get outcomeChart => _outcomeChart;
 
-  //排序
+
+  ///对列表数据进行排序
   List<DetailListItem>  get detailList{
     for(int i = 0;i < _incomeList.length;i++){
       _outcomeList.add(_incomeList[i]);
@@ -47,14 +49,14 @@ class BookKeepingManager{
     return _outcomeList;
   }
 
-  //总收入
+  ///主页标题总收入
   double get outcomeAmount {
     double sum = 0;
     _outcomeList.forEach((element) {sum += element.amount;});
     return sum.toPrecision(2);
   }
 
-  //总支出
+  ///主页标题总支出
   double get incomeAmount {
     double sum = 0;
     _incomeList.forEach((element) {sum += element.amount;});
@@ -62,22 +64,31 @@ class BookKeepingManager{
     return sum.toPrecision(2);
   }
 
-
+  ///需要同步的信息
   Future sync(DateTime dateTime) async {
-    var res = await DetailListApi(dateTime).start();
-    var data = DetailedListReply.fromJson(res.data);
-    // TODO 处理失败情况
-    _incomeList = data.incomeList;
-    _outcomeList = data.outcomeList;
+    var resList = await DetailListApi(dateTime).start();
+    var resChart = await DetailChartApi().start();
+
+    var dataList = DetailedListReply.fromJson(resList.data);
+    var dataChart = DetailedChartReply.fromJson(resChart.data);
+
+    _incomeList = dataList.incomeList;
+    _outcomeList = dataList.outcomeList;
+
+    _incomeChart = dataChart.incomeChart;
+    _outcomeChart = dataChart.outcomeChart;
+
     _controller.sync();
   }
 
+  ///删除一条信息
   Future delete(bool isOutcome,int timeStamp,DateTime dateTime) async{
     var data = (await DeleteRecordApi(isOutcome: isOutcome,timeStamp: timeStamp).start()).data;
     sync(dateTime);
     return data;
   }
 
+  ///修改一条信息
   Future modify(bool isOutcome,int oldTimeStamp,int timeStamp,double amount,String type,String remarks,DateTime dateTime) async{
     var data = (await ModifyRecordApi(isOutcome: isOutcome,oldTimeStamp: oldTimeStamp,timeStamp: timeStamp,amount: amount,type: type,remarks: remarks).start()).data;
     sync(dateTime);

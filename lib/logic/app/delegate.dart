@@ -16,7 +16,7 @@ class AppDelegate {
   Future beforeAppLaunch() async {
     await HiveHelper.instance.initHive();
     await AppConfigManager.instance.sync();
-    BookKeepingManager.instance.sync(DateTime.now());
+    await BookKeepingManager.instance.sync(DateTime.now());
     BookKeepingManager.instance.initController();
   }
 }

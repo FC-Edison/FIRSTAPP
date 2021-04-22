@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:xiao_yu_ji_zhang/ui/ui.dart';
+import 'package:get/get.dart';
 
 class SelectedBar extends StatelessWidget {
   final int currentIndex;
@@ -24,7 +26,7 @@ class SelectedBar extends StatelessWidget {
         onValueChanged: onSelectedItemChange,
         selectedColor: selectedColor,
         unselectedColor: unselectedColor,
-        children: Map.fromIterable(items,key: (item) => items.indexOf(item), value: (item) => Text(item)),
+        children: Map.fromIterable(items,key: (item) => items.indexOf(item), value: (item) => Container(width: Get.size.width,alignment: Alignment.center,child: Text(item,style: TextStyle(fontSize: 14)),))
       ),
     );
   }

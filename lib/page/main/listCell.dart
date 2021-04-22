@@ -8,7 +8,7 @@ class ListCell extends StatelessWidget {
 
   const ListCell({Key key, this.item}) : super(key: key);
 
-  List<int> get colorList => [0xffff8303,0xffc67ace,0xff0e49b5,0xffd7385e,0xff0e918c,0xff6a097d,0xffec0101,0xffff5722,0xff7fdbda,0xff1b6ca8,0xffb590ca,0xffbaf1a1,0xfff1935c,0xff916dd5];
+  List<int> get colorList => [0xccff8303,0xccc67ace,0xcc0e49b5,0xccd7385e,0xcc0e918c,0xcc6a097d,0xeeec0101,0xffff5722,0xff7fdbda,0xff1b6ca8,0xffb590ca,0xffbaf1a1,0xfff1935c,0xff916dd5];
 
   Color typeColor (String type){
     for(int i = 0;i < AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig.length;i++){
@@ -44,7 +44,7 @@ class ListCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-        height: 85,
+        height: 70,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -56,15 +56,15 @@ class ListCell extends StatelessWidget {
                 children: [
                   Container(width: 14),
                   Container(
-                    width: 54,
+                    width: 48,
                     child: Container(
-                        width: 54,
-                        height: 54,
+                        width: 48,
+                        height: 48,
                         decoration: BoxDecoration(
                             color:  typeColor(item.type),
-                            borderRadius: BorderRadius.all(Radius.circular(27))),
+                            borderRadius: BorderRadius.all(Radius.circular(24))),
                         child: Center(
-                          child: Image.network(typeIcon(item.type) ,width: 28,),
+                          child: Image.network(typeIcon(item.type) ,width: 25,),
                         )),
                   ),
                   Container(width: 12),
@@ -76,7 +76,7 @@ class ListCell extends StatelessWidget {
                       text: TextSpan(children: [
                         TextSpan(
                             text: item.type,
-                            style: TextStyle(color: Colors.black87, fontSize: 16)),
+                            style: TextStyle(color: Colors.black54, fontSize: 14)),
                         TextSpan(
                           text: item.remarks == "" ? "" : " - " + item.remarks,
                           style: TextStyle(color: Colors.black54, fontSize: 14),

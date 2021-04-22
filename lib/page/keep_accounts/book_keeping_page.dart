@@ -154,272 +154,276 @@ class _BookKeepingPageState extends State<BookKeepingPage> {
           elevation: 0,
           backgroundColor: AlternativeColors.basicColor,
           centerTitle: true,
-          title: Text(widget.isFromList ? '改一下' : '记一笔')),
+          title: Text(widget.isFromList ? '改一下' : '记一笔',style: TextStyle(fontWeight: FontWeight.bold),)),
       body: SingleChildScrollView(
         controller: _scrollController,
-        child: Center(
-          child: Column(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 60,
-                color: AlternativeColors.basicColor,
-                child: SelectedBar(
-                        currentIndex: widget.isFromList ? (widget.initInformation.isOutcome ? 0 : 1) : selectBarCurrentIndex,
-                        items: selectBarItems,
-                        onSelectedItemChange: onSelectBarItemChange,
-                        height: 60,
-                        borderColor: Colors.white,
-                        selectedColor: Colors.white,
-                        unselectedColor: AlternativeColors.basicColor,
-                        padding:
-                            EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                      ),
-              ),
-              Column(
-                children: [
-                  Container(
-                    color: Colors.white,
-                    child: Column(
-                      children: [
-                        Container(
-                          color: Colors.white,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+        child: Container(
+          color: Colors.white,
+          height: Get.size.height,
+          child: Center(
+            child: Column(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  color: AlternativeColors.basicColor,
+                  child: SelectedBar(
+                    currentIndex: widget.isFromList ? (widget.initInformation.isOutcome ? 0 : 1) : selectBarCurrentIndex,
+                    items: selectBarItems,
+                    onSelectedItemChange: onSelectBarItemChange,
+                    height: 60,
+                    borderColor: Colors.white,
+                    selectedColor: Colors.white,
+                    unselectedColor: AlternativeColors.basicColor,
+                    padding:
+                    EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                  ),
+                ),
+                Column(
+                  children: [
+                    Container(
+                      color: Colors.white,
+                      child: Column(
+                        children: [
+                          Container(
+                            color: Colors.white,
+                            padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
 
-                              ///日期选择框
-                              Expanded(
-                                flex: 5,
-                                child: SizedBox(
-                                  height: 30,
-                                  child: OutlinedButton(
-                                      onPressed: () {
-                                        Picker(
-                                            confirmText: "确认",
-                                            cancelText: "取消",
-                                            confirmTextStyle:
-                                                TextStyle(fontSize: 18),
-                                            cancelTextStyle: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.grey),
-                                            adapter: DateTimePickerAdapter(
-                                                isNumberMonth: true,
-                                                yearBegin: 2018,
-                                                yearEnd: 2022,
-                                                value: DateTime(
-                                                        currentYear,
-                                                        currentMonth,
-                                                        currentDay),
-                                                type: PickerDateTimeType.kYMD
-
-
-                                            ),
-                                            onConfirm:
-                                                (Picker picker, List value) {
-                                              setState(() {
-                                                currentYear = 2018 + value[0];
-                                                currentMonth = value[1] + 1;
-                                                currentDay = value[2] + 1;
-                                              });
-                                            }).showModal(this.context);
-                                      },
-                                      child: Text('$currentMonth月$currentDay日',
-                                        style: TextStyle(
-                                            color: Colors.black54,
-                                            fontSize: 14),
-                                      )),
-                                ),
-                              ),
-
-
-                              Expanded(
-                                child: Container(),
-                                flex: 1,
-                              ),
-
-                              ///金额输入框
-                              Expanded(
-                                  flex: 15,
+                                ///日期选择框
+                                Expanded(
+                                  flex: 5,
                                   child: SizedBox(
                                     height: 30,
-                                    child: TextField(
-                                      controller: amountController,
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                          labelStyle: TextStyle(fontSize: 14),
-                                          labelText: "￥0.00",
-                                          floatingLabelBehavior:
-                                              FloatingLabelBehavior.never,
-                                          border: OutlineInputBorder()),
-                                    ),
-                                  ))
-                            ],
-                          ),
-                        ),
+                                    child: OutlinedButton(
+                                        onPressed: () {
+                                          Picker(
+                                              confirmText: "确认",
+                                              cancelText: "取消",
+                                              confirmTextStyle:
+                                              TextStyle(fontSize: 18),
+                                              cancelTextStyle: TextStyle(
+                                                  fontSize: 18,
+                                                  color: Colors.grey),
+                                              adapter: DateTimePickerAdapter(
+                                                  isNumberMonth: true,
+                                                  yearBegin: 2018,
+                                                  yearEnd: 2022,
+                                                  value: DateTime(
+                                                      currentYear,
+                                                      currentMonth,
+                                                      currentDay),
+                                                  type: PickerDateTimeType.kYMD
 
-                        ///按钮
-                        Container(
-                            color: Colors.white,
-                            height: ((
-                                widget.isFromList ?  (widget.initInformation.isOutcome ?
-                                AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig.length :
-                                AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig.length) :
-                                currentConfig.bookKeepingButtonConfig.length) / 5) * 85,
-                            child: GridView.count(
-                                primary: false,
-                                padding: const EdgeInsets.all(10),
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                                crossAxisCount: 5,
-                                children: List.generate(
+
+                                              ),
+                                              onConfirm:
+                                                  (Picker picker, List value) {
+                                                setState(() {
+                                                  currentYear = 2018 + value[0];
+                                                  currentMonth = value[1] + 1;
+                                                  currentDay = value[2] + 1;
+                                                });
+                                              }).showModal(this.context);
+                                        },
+                                        child: Text('$currentMonth月$currentDay日',
+                                          style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 14),
+                                        )),
+                                  ),
+                                ),
+
+
+                                Expanded(
+                                  child: Container(),
+                                  flex: 1,
+                                ),
+
+                                ///金额输入框
+                                Expanded(
+                                    flex: 15,
+                                    child: SizedBox(
+                                      height: 30,
+                                      child: TextField(
+                                        controller: amountController,
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                            labelStyle: TextStyle(fontSize: 14),
+                                            labelText: "￥0.00",
+                                            floatingLabelBehavior:
+                                            FloatingLabelBehavior.never,
+                                            border: OutlineInputBorder()),
+                                      ),
+                                    ))
+                              ],
+                            ),
+                          ),
+
+                          ///按钮
+                          Container(
+                              color: Colors.white,
+                              height: ((
                                   widget.isFromList ?  (widget.initInformation.isOutcome ?
                                   AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig.length :
                                   AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig.length) :
-                                  currentConfig.bookKeepingButtonConfig.length,
-                                    (index) => SelectedButton(
-                                          icon:
-                                          widget.isFromList ?  (widget.initInformation.isOutcome ?
-                                          AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig[index].icon :
-                                          AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig[index].icon) :
-                                          currentConfig.bookKeepingButtonConfig[index].icon,
-                                          iconSel:
-                                          widget.isFromList ?  (widget.initInformation.isOutcome ?
-                                          AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig[index].iconSel :
-                                          AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig[index].iconSel) :
-                                          currentConfig.bookKeepingButtonConfig[index].iconSel,
-                                          type:
-                                          widget.isFromList ?  (widget.initInformation.isOutcome ?
-                                          AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig[index].type :
-                                          AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig[index].type) :
-                                          currentConfig.bookKeepingButtonConfig[index].type,
-                                          isSelected:
-                                          buttonSelectedIndex == index,
-                                          onTap: () {
-                                            selectedType = currentConfig
-                                                .bookKeepingButtonConfig[index]
-                                                .type;
-                                            FocusScope.of(context)
-                                                .requestFocus(FocusNode());
-                                            setState(() {
-                                              buttonSelectedIndex = index;
-                                            });
-                                          },
-                                        )))),
+                                  currentConfig.bookKeepingButtonConfig.length) / 5) * 85,
+                              child: GridView.count(
+                                  primary: false,
+                                  padding: const EdgeInsets.all(10),
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                  crossAxisCount: 5,
+                                  children: List.generate(
+                                      widget.isFromList ?  (widget.initInformation.isOutcome ?
+                                      AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig.length :
+                                      AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig.length) :
+                                      currentConfig.bookKeepingButtonConfig.length,
+                                          (index) => SelectedButton(
+                                        icon:
+                                        widget.isFromList ?  (widget.initInformation.isOutcome ?
+                                        AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig[index].icon :
+                                        AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig[index].icon) :
+                                        currentConfig.bookKeepingButtonConfig[index].icon,
+                                        iconSel:
+                                        widget.isFromList ?  (widget.initInformation.isOutcome ?
+                                        AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig[index].iconSel :
+                                        AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig[index].iconSel) :
+                                        currentConfig.bookKeepingButtonConfig[index].iconSel,
+                                        type:
+                                        widget.isFromList ?  (widget.initInformation.isOutcome ?
+                                        AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig[index].type :
+                                        AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig[index].type) :
+                                        currentConfig.bookKeepingButtonConfig[index].type,
+                                        isSelected:
+                                        buttonSelectedIndex == index,
+                                        onTap: () {
+                                          selectedType = currentConfig
+                                              .bookKeepingButtonConfig[index]
+                                              .type;
+                                          FocusScope.of(context)
+                                              .requestFocus(FocusNode());
+                                          setState(() {
+                                            buttonSelectedIndex = index;
+                                          });
+                                        },
+                                      )))),
 
-                        ///备注输入框
-                        Container(
-                            color: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 8),
-                            child: SizedBox(
-                              height: 30,
-                              child: TextFormField(
-                                controller: remarkController,
-                                decoration: InputDecoration(
-                                    labelStyle: TextStyle(fontSize: 14),
-                                    labelText: "备注：",
-                                    floatingLabelBehavior:
-                                        FloatingLabelBehavior.never,
-                                    border: OutlineInputBorder()),
-                              ),
-                            ))
-                      ],
-                    ),
-                  ),
-
-                  ///底下俩按钮
-                  Container(
-                    color: Colors.white,
-                    height: 300,
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.white),
-                                minimumSize:
-                                    MaterialStateProperty.all(Size(160, 40))),
-                            onPressed: () async {
-                              if (widget.isFromList) {
-                                var response = await BookKeepingManager.instance
-                                    .delete( widget.initInformation.isOutcome ? true : false,
-                                        widget.initInformation.timeStamp,DateTime(currentYear,currentMonth,currentDay,currentHour,currentMinute,currentSecond));
-                                if (response["success"]) {
-                                  BotToast.showText(text: "删除成功");
-                                } else {
-                                  BotToast.showText(text: response["message"]);
-                                }
-                                Get.back(result: DateTime(currentYear, currentMonth, currentDay, currentHour,
-                                    currentMinute, currentSecond));
-                              } else {
-                                if (await save()) {
-                                  amountController.clear();
-                                  remarkController.clear();
-                                }
-                              }
-                            },
-                            child: Text(
-                              (widget.isFromList ? '删除' : '保存再记'),
-                              style: TextStyle(
-                                  color: AlternativeColors.basicColor),
-                            ),
-                          ),
-                          ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                      AlternativeColors.basicColor),
-                                  minimumSize:
-                                      MaterialStateProperty.all(Size(160, 40))),
-                              onPressed: () async {
-                                if (widget.isFromList) {
-                                  if (double.tryParse(amountController.text) ==
-                                      null) {
-                                    BotToast.showText(text: "金额输入有误！");
-                                    amountController.clear();
-                                    return;
-                                  }else if(buttonSelectedIndex == null){
-                                    BotToast.showText(text: "请选择一个类型！");
-                                    return;
-                                  }
-                                  var response =
-                                      await BookKeepingManager.instance.modify(
-                                          widget.initInformation.isOutcome ? true : false,
-                                          widget.initInformation.timeStamp,
-                                          DateTime(currentYear, currentMonth, currentDay, currentHour,
-                                              currentMinute, currentSecond)
-                                              .millisecondsSinceEpoch,
-                                          (double.parse(amountController.text)),
-                                          (widget.initInformation.isOutcome ?
-                                          AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig[buttonSelectedIndex].type :
-                                          AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig[buttonSelectedIndex].type) ,
-                                          remarkController.text,DateTime(currentYear,currentMonth,currentDay,currentHour,currentMinute,currentSecond));
-                                  if (response["success"]) {
-                                    BotToast.showText(text: "保存成功");
-                                  } else {
-                                    BotToast.showText(
-                                        text: response["message"]);
-                                  }
-                                } else {
-                                  if (await save()) {
-
-                                  }
-                                }
-                                Get.back(result: DateTime(currentYear, currentMonth, currentDay, currentHour,
-                                    currentMinute, currentSecond));
-                              },
-                              child: Text('保存')),
+                          ///备注输入框
+                          Container(
+                              color: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              child: SizedBox(
+                                height: 30,
+                                child: TextFormField(
+                                  controller: remarkController,
+                                  decoration: InputDecoration(
+                                      labelStyle: TextStyle(fontSize: 14),
+                                      labelText: "备注：",
+                                      floatingLabelBehavior:
+                                      FloatingLabelBehavior.never,
+                                      border: OutlineInputBorder()),
+                                ),
+                              ))
                         ],
                       ),
                     ),
-                  )
-                ],
-              )
-            ],
+
+                    ///底下俩按钮
+                    Container(
+                      color: Colors.white,
+                      height: 260,
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                  MaterialStateProperty.all(Colors.white),
+                                  minimumSize:
+                                  MaterialStateProperty.all(Size(160, 40))),
+                              onPressed: () async {
+                                if (widget.isFromList) {
+                                  var response = await BookKeepingManager.instance
+                                      .delete( widget.initInformation.isOutcome ? true : false,
+                                      widget.initInformation.timeStamp,DateTime(currentYear,currentMonth,currentDay,currentHour,currentMinute,currentSecond));
+                                  if (response["success"]) {
+                                    BotToast.showText(text: "删除成功");
+                                  } else {
+                                    BotToast.showText(text: response["message"]);
+                                  }
+                                  Get.back(result: DateTime(currentYear, currentMonth, currentDay, currentHour,
+                                      currentMinute, currentSecond));
+                                } else {
+                                  if (await save()) {
+                                    amountController.clear();
+                                    remarkController.clear();
+                                  }
+                                }
+                              },
+                              child: Text(
+                                (widget.isFromList ? '删除' : '保存再记'),
+                                style: TextStyle(
+                                    color: AlternativeColors.basicColor),
+                              ),
+                            ),
+                            ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        AlternativeColors.basicColor),
+                                    minimumSize:
+                                    MaterialStateProperty.all(Size(160, 40))),
+                                onPressed: () async {
+                                  if (widget.isFromList) {
+                                    if (double.tryParse(amountController.text) ==
+                                        null) {
+                                      BotToast.showText(text: "金额输入有误！");
+                                      amountController.clear();
+                                      return;
+                                    }else if(buttonSelectedIndex == null){
+                                      BotToast.showText(text: "请选择一个类型！");
+                                      return;
+                                    }
+                                    var response =
+                                    await BookKeepingManager.instance.modify(
+                                        widget.initInformation.isOutcome ? true : false,
+                                        widget.initInformation.timeStamp,
+                                        DateTime(currentYear, currentMonth, currentDay, currentHour,
+                                            currentMinute, currentSecond)
+                                            .millisecondsSinceEpoch,
+                                        (double.parse(amountController.text)),
+                                        (widget.initInformation.isOutcome ?
+                                        AppConfigManager.instance.outcomeConfig.bookKeepingButtonConfig[buttonSelectedIndex].type :
+                                        AppConfigManager.instance.incomeConfig.bookKeepingButtonConfig[buttonSelectedIndex].type) ,
+                                        remarkController.text,DateTime(currentYear,currentMonth,currentDay,currentHour,currentMinute,currentSecond));
+                                    if (response["success"]) {
+                                      BotToast.showText(text: "保存成功");
+                                    } else {
+                                      BotToast.showText(
+                                          text: response["message"]);
+                                    }
+                                  } else {
+                                    if (await save()) {
+
+                                    }
+                                  }
+                                  Get.back(result: DateTime(currentYear, currentMonth, currentDay, currentHour,
+                                      currentMinute, currentSecond));
+                                },
+                                child: Text('保存')),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -15,7 +15,7 @@ class FirstLine extends StatefulWidget {
 }
 
 class _FirstLineState extends State<FirstLine> {
-  final DetailListController detailController = Get.find();
+  final DetailDataController detailController = Get.find();
 
   int currentYear = DateTime.now().year;
   int currentMonth = DateTime.now().month;

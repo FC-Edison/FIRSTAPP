@@ -30,7 +30,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
 
-  final DetailListController detailController = Get.find();
+  final DetailDataController detailController = Get.find();
 
   int selectBarCurrentIndex = 0;
   List<String> selectBarItems = ["明细", "报表"];
@@ -107,10 +107,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    double outcomeAmount = (detailController.outcomeAmount.toDouble() - detailController.incomeAmount.toDouble()).toPrecision(2);
-    double incomeAmount = detailController.incomeAmount.toDouble().toPrecision(2);
-
     return Scaffold(
         floatingActionButton: FloatingActionButton(
           backgroundColor: AlternativeColors.basicColor,
@@ -123,7 +119,7 @@ class _MainPageState extends State<MainPage> {
             elevation: 0,
             backgroundColor: AlternativeColors.basicColor,
             title: Center(
-              child: Text('记账本'),
+              child: Text('记账本',style: TextStyle(fontWeight: FontWeight.bold)),
             )),
         body: Stack(
           alignment: const FractionalOffset(0.5, 1.0),
@@ -154,7 +150,7 @@ class _MainPageState extends State<MainPage> {
                                   width: 90,
                                   color: AlternativeColors.basicColor,
                                   child: TextButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       timeTo = null;
                                       Picker(
                                           confirmText: "确认",
@@ -168,12 +164,12 @@ class _MainPageState extends State<MainPage> {
                                               isNumberMonth: true,
                                               value: DateTime(currentYear, currentMonth) ,
                                               type: PickerDateTimeType.kYM),
-                                          onConfirm: (Picker picker, List value) {
+                                          onConfirm: (Picker picker, List value) async {
                                             setState(() {
                                               currentYear = 2018 + value[0];
                                               currentMonth = value[1] + 1;
                                             });
-                                            BookKeepingManager.instance.sync(DateTime(currentYear,currentMonth));
+                                            await BookKeepingManager.instance.sync(DateTime(currentYear,currentMonth));
                                           }).showModal(this.context);
                                     },
                                     child: Column(
@@ -189,7 +185,7 @@ class _MainPageState extends State<MainPage> {
                                                 text: currentMonth >= 10? ((timeTo) == null ? "$currentMonth" : timeTo.month.toString()) :
                                                 ((timeTo) == null ? "0$currentMonth" : "0" + timeTo.month.toString()),
                                                 // "$currentMonth" : "0$currentMonth",
-                                                style: TextStyle(fontSize: 18),
+                                                style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),
                                               ),
                                               TextSpan(text: "月",style: TextStyle(fontSize: 13)),
                                             ])),
@@ -234,7 +230,7 @@ class _MainPageState extends State<MainPage> {
                                           (index) => Container(
                                         width: 1,
                                         height: 4,
-                                        color: Colors.white,
+                                        color: Colors.white70,
                                       ),
                                     ),
                                   ),
@@ -262,7 +258,7 @@ class _MainPageState extends State<MainPage> {
                                                   color: Colors.white,
                                                 )),
                                             Text(
-                                              '$outcomeAmount',
+                                                (detailController.outcomeAmount.toDouble() - detailController.incomeAmount.toDouble()).toPrecision(2).toString(),
                                               maxLines: 1,
                                               style:
                                               TextStyle(fontSize: 14, color: Colors.white),
@@ -292,7 +288,7 @@ class _MainPageState extends State<MainPage> {
                                           color: Colors.white,
                                         )),
                                     Text(
-                                      '$incomeAmount',
+                                      detailController.incomeAmount.toDouble().toPrecision(2).toString(),
                                       maxLines: 1,
                                       style: TextStyle(fontSize: 14, color: Colors.white),
                                     )
@@ -306,15 +302,24 @@ class _MainPageState extends State<MainPage> {
                 }
                 //明细报表行
                 else if (index == 1)
-                  return SelectedBar(
-                    currentIndex: selectBarCurrentIndex,
-                    items: selectBarItems,
-                    onSelectedItemChange: onSelectBarItemChange,
-                    height: 40,
-                    borderColor: AlternativeColors.basicColor,
-                    selectedColor: AlternativeColors.basicColor,
-                    unselectedColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                  return Container(
+                    width: Get.size.width,
+                    color: Colors.white,
+                    child: Column(
+                      children: [
+                        SelectedBar(
+                          currentIndex: selectBarCurrentIndex,
+                          items: selectBarItems,
+                          onSelectedItemChange: onSelectBarItemChange,
+                          height: 40,
+                          borderColor: AlternativeColors.basicColor,
+                          selectedColor: AlternativeColors.basicColor,
+                          unselectedColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+                        ),
+                        (detailController.detailList.isNotEmpty && index == 1 && selectBarCurrentIndex == 0) ? SmallInformationBar(cellInforBar:cellAddInforBar[0]) : Container()
+                      ],
+                    ),
                   );
 
 
@@ -322,7 +327,7 @@ class _MainPageState extends State<MainPage> {
                   if (index < (detailController.detailList.isEmpty ? 0 : (detailController.detailList.length + 1))  + 2) {
                     var cellIndex = index - 3;
                     if(detailController.detailList.isNotEmpty && index == 2){
-                      return SmallInformationBar(cellInforBar:cellAddInforBar[0]);
+                      return Container();
                     }
 
                     return Container(child: Column(children: [
@@ -386,7 +391,7 @@ class _MainPageState extends State<MainPage> {
               },
               separatorBuilder: (BuildContext context, int index) =>
               const Divider(
-                height: 1,
+                height: 0.5,
               ),
             )),
             TextButton(
@@ -402,7 +407,7 @@ class _MainPageState extends State<MainPage> {
                 },
                 child: Container(
                   height: 50,
-                  width: 400,
+                  width: Get.size.width,
                   child: Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -413,7 +418,7 @@ class _MainPageState extends State<MainPage> {
                           size: 30,
                         ),
                         Text('记一笔',
-                          style: TextStyle(color: AlternativeColors.basicColor, fontSize: 17)),
+                          style: TextStyle(color: AlternativeColors.basicColor, fontSize: 17,fontWeight: FontWeight.bold)),
                         ],
                   )),
                 ))
