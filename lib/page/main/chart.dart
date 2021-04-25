@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:xiao_yu_ji_zhang/logic/book_keeping/controller.dart';
 import 'package:xiao_yu_ji_zhang/logic/book_keeping/model.dart';
-import 'package:xiao_yu_ji_zhang/page/main/my_line_chart.dart';
+import 'package:xiao_yu_ji_zhang/page/main/my_bar_chart.dart';
 import 'package:xiao_yu_ji_zhang/page/main/my_pie_chart.dart';
 
 class ChartPage extends StatefulWidget {
@@ -16,44 +16,41 @@ class _ChartPageState extends State<ChartPage> with SingleTickerProviderStateMix
 
   TabController _tabController;
 
+  List<DetailChartItem> yearOutcomeData,monthOutcomeData,weekOutcomeData,
+                        yearIncomeData,monthIncomeData,weekIncomeData;
 
-
-  ///获取支出全部数据
-  List<DetailChartItem> get outcomeChartData{
-    List<DetailChartItem> list = List<DetailChartItem>();
-    for(int i = 0;i < detailController.outcomeChart.length;i++){
-      list.add(detailController.outcomeChart[i]);
-    }
-    return list;
+  ///初始化状态
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    yearOutcomeData = _yearOutcomeData;
+    monthOutcomeData = _monthOutcomeData;
+    weekOutcomeData = _weekOutcomeData;
+    yearIncomeData = _yearIncomeData;
+    monthIncomeData = _monthIncomeData;
+    weekIncomeData = _weekIncomeData;
   }
 
-  ///获取收入全部数据
-  List<DetailChartItem> get incomeChartData{
-    List<DetailChartItem> list = List<DetailChartItem>();
-    for(int i = 0;i < detailController.incomeChart.length;i++){
-      list.add(detailController.incomeChart[i]);
-    }
-    return list;
-  }
 
-  ///年数据
-  List<DetailChartItem> get yearOutcomeData{
-    List<DetailChartItem> list = List<DetailChartItem>();
+  ///支出年数据
+  List<DetailChartItem> get _yearOutcomeData{
+    List<DetailChartItem> list = [];
     for(int i = 0;;i++){
-      if(i == outcomeChartData.length){
+      if(i == detailController.outcomeChart.length){
         break;
       }
-      if(DateTime.fromMillisecondsSinceEpoch(outcomeChartData[i].timeStamp).year == DateTime.now().year){
-          list.add(outcomeChartData[i]);
+      if(DateTime.fromMillisecondsSinceEpoch(detailController.outcomeChart[i].timeStamp).year == DateTime.now().year){
+          list.add(detailController.outcomeChart[i]);
       }
     }
     list.sort();
     return list;
   }
 
-  ///月数据
-  List<DetailChartItem> get monthOutcomeData{
-    List<DetailChartItem> list = List<DetailChartItem>();
+  ///支出月数据
+  List<DetailChartItem> get _monthOutcomeData{
+    List<DetailChartItem> list = [];
     for(int i = 0;;i++){
       if(i == yearOutcomeData.length){
         break;
@@ -62,13 +59,59 @@ class _ChartPageState extends State<ChartPage> with SingleTickerProviderStateMix
           list.add(yearOutcomeData[i]);
       }
     }
+    return list;
+  }
+
+  ///支出周数据
+  List<DetailChartItem> get _weekOutcomeData{
+    List<DetailChartItem> list = [];
+    int differenceDay;
+    int differenceWeekday;
+    for(int i = 0;;i++){
+      if(i == monthOutcomeData.length){
+        break;
+      }
+      differenceDay = DateTime.now().day - DateTime.fromMillisecondsSinceEpoch(monthOutcomeData[i].timeStamp).day;
+      differenceWeekday = DateTime.now().weekday - DateTime.fromMillisecondsSinceEpoch(monthOutcomeData[i].timeStamp).weekday;
+      if(differenceWeekday == differenceDay){
+          list.add(monthOutcomeData[i]);
+      }
+    }
+    return list;
+  }
+
+  ///收入年数据
+  List<DetailChartItem> get _yearIncomeData{
+    List<DetailChartItem> list = [];
+    for(int i = 0;;i++){
+      if(i == detailController.incomeChart.length){
+        break;
+      }
+      if(DateTime.fromMillisecondsSinceEpoch(detailController.incomeChart[i].timeStamp).year == DateTime.now().year){
+          list.add(detailController.incomeChart[i]);
+      }
+    }
     list.sort();
     return list;
   }
 
-  ///周数据
-  List<DetailChartItem> get weekOutcomeData{
-    List<DetailChartItem> list = List<DetailChartItem>();
+  ///收入月数据
+  List<DetailChartItem> get _monthIncomeData{
+    List<DetailChartItem> list = [];
+    for(int i = 0;;i++){
+      if(i == yearIncomeData.length){
+        break;
+      }
+      if(DateTime.fromMillisecondsSinceEpoch(yearIncomeData[i].timeStamp).month == DateTime.now().month){
+          list.add(yearIncomeData[i]);
+      }
+    }
+    return list;
+  }
+
+  ///收入周数据
+  List<DetailChartItem> get _weekIncomeData{
+    List<DetailChartItem> list = [];
     int day;
     int weekday;
     int dayNow;
@@ -76,31 +119,25 @@ class _ChartPageState extends State<ChartPage> with SingleTickerProviderStateMix
     int differenceDay;
     int differenceWeekday;
     for(int i = 0;;i++){
-      if(i == monthOutcomeData.length){
+      if(i == monthIncomeData.length){
         break;
       }
-      day = DateTime.fromMillisecondsSinceEpoch(yearOutcomeData[i].timeStamp).day;
-      weekday = DateTime.fromMillisecondsSinceEpoch(yearOutcomeData[i].timeStamp).weekday;
+      day = DateTime.fromMillisecondsSinceEpoch(monthIncomeData[i].timeStamp).day;
+      weekday = DateTime.fromMillisecondsSinceEpoch(monthIncomeData[i].timeStamp).weekday;
       dayNow = DateTime.now().day;
       weekdayNow = DateTime.now().weekday;
       differenceDay = dayNow - day;
       differenceWeekday = weekdayNow - weekday;
       if(differenceWeekday == differenceDay){
-          list.add(monthOutcomeData[i]);
+          list.add(monthIncomeData[i]);
       }
     }
-    list.sort();
     return list;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
+  ///定义周月年的全局变量
   final int weekIndex = 0;
   final int monthIndex = 1;
-
   final int yearIndex = 2;
 
   @override
@@ -126,34 +163,27 @@ class _ChartPageState extends State<ChartPage> with SingleTickerProviderStateMix
             height: Get.size.height / 3 * 2,
             width: Get.size.width,
             child: TabBarView(
+              physics: BouncingScrollPhysics(),
               controller: _tabController,
               children: <Widget>[
                 Container(
                   width: Get.size.width,
-                  child: FutureBuilder(
-                    future: Future.value(weekOutcomeData),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        return Column(
-                          children: [
-                            MyLineChart(tabBarIndex: weekIndex,list: snapshot.data),
-                            SizedBox(height: 3),
-                            MyPieChart(tabBarIndex: weekIndex,list: snapshot.data)
-                          ],
-                        );
-                      } else {
-                        return Center(child: CircularProgressIndicator(),);
-                      }
-                    },
-                  ),
+                  child: Column(
+                    children: [
+                      MyBarChart(tabBarIndex: weekIndex,outcomeList: weekOutcomeData,incomeList: weekIncomeData),
+                      SizedBox(height: 3),
+                      MyPieChart(tabBarIndex: weekIndex,outcomeList: weekOutcomeData,incomeList: weekIncomeData)
+
+                    ],
+                  )
                 ),
                 Container(
                   width: Get.size.width,
                   child: Column(
                     children: [
-                      MyLineChart(tabBarIndex: monthIndex,list: monthOutcomeData),
+                      MyBarChart(tabBarIndex: monthIndex,outcomeList: monthOutcomeData,incomeList: monthIncomeData),
                       SizedBox(height: 3),
-                      MyPieChart(tabBarIndex: monthIndex,list: monthOutcomeData)
+                      MyPieChart(tabBarIndex: monthIndex,outcomeList: monthOutcomeData,incomeList: monthIncomeData)
                     ],
                   ),
                 ),
@@ -161,14 +191,12 @@ class _ChartPageState extends State<ChartPage> with SingleTickerProviderStateMix
                   width: Get.size.width,
                   child: Column(
                     children: [
-                      MyLineChart(tabBarIndex: yearIndex,list: yearOutcomeData),
+                      MyBarChart(tabBarIndex: yearIndex,outcomeList: yearOutcomeData,incomeList: yearIncomeData),
                       SizedBox(height: 3),
-                      MyPieChart(tabBarIndex: yearIndex,list: yearOutcomeData)
+                      MyPieChart(tabBarIndex: yearIndex,outcomeList: yearOutcomeData,incomeList: yearIncomeData)
                     ],
                   ),
                 ),
-                // Container(),
-                // Container()
               ],
             ),
           )

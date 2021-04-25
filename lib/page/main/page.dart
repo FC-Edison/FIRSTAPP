@@ -125,6 +125,7 @@ class _MainPageState extends State<MainPage> {
           alignment: const FractionalOffset(0.5, 1.0),
           children: [
             Obx(() => ListView.separated(
+              physics: BouncingScrollPhysics(),
               padding: const EdgeInsets.all(0),
               itemCount: selectBarCurrentIndex == 0 ? (detailController.detailList.isEmpty ?
                                                         0 : (detailController.detailList.length + 1)) + 3 : 3,

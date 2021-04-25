@@ -11,13 +11,13 @@ class DetailedListReply {
     success = json['success'];
     message = json['message'];
     if (json['incomeList'] != null) {
-      incomeList = new List<DetailListItem>();
+      incomeList = [];
       json['incomeList'].forEach((v) {
         incomeList.add(new DetailListItem.fromJson(v));
       });
     }
     if (json['outcomeList'] != null) {
-      outcomeList = new List<DetailListItem>();
+      outcomeList = [];
       json['outcomeList'].forEach((v) {
         outcomeList.add(new DetailListItem.fromJson(v));
       });
@@ -90,13 +90,13 @@ class DetailedChartReply {
     success = json['success'];
     message = json['message'];
     if (json['incomeList'] != null) {
-      incomeChart = new List<DetailChartItem>();
+      incomeChart = [];
       json['incomeList'].forEach((v) {
         incomeChart.add(new DetailChartItem.fromJson(v));
       });
     }
     if (json['outcomeList'] != null) {
-      outcomeChart = new List<DetailChartItem>();
+      outcomeChart = [];
       json['outcomeList'].forEach((v) {
         outcomeChart.add(new DetailChartItem.fromJson(v));
       });
@@ -147,9 +147,9 @@ class DetailChartItem extends Comparable{
   @override
   int compareTo(other) {
       if (this.timeStamp > other.timeStamp) {
-        return -1;
-      } else if (this.timeStamp < other.timeStamp) {
         return 1;
+      } else if (this.timeStamp < other.timeStamp) {
+        return -1;
       }
       return 0;
   }

@@ -6,8 +6,9 @@ import 'package:xiao_yu_ji_zhang/ui/ui.dart';
 class MyLineChart extends StatefulWidget {
 
   final int tabBarIndex;
-  final List<DetailChartItem> list;
-  const MyLineChart({Key key, this.tabBarIndex, this.list}) : super(key: key);
+  final List<DetailChartItem> outcomeList;
+  final List<DetailChartItem> incomeList;
+  const MyLineChart({Key key, this.tabBarIndex, this.outcomeList, this.incomeList}) : super(key: key);
   @override
   _LineChartState createState() => _LineChartState();
 }
@@ -15,18 +16,20 @@ class MyLineChart extends StatefulWidget {
 class _LineChartState extends State<MyLineChart> {
   bool isShowingMainData;
   int tabBarIndex;
-  List<DetailChartItem> list;
+  List<DetailChartItem> outcomeList;
+  List<DetailChartItem> incomeList;
 
   @override
   void initState() {
     super.initState();
     tabBarIndex = widget.tabBarIndex;
     isShowingMainData = true;
-    list = widget.list;
+    outcomeList = widget.outcomeList;
+    incomeList = widget.incomeList;
   }
 
-  ///月度趋势底线按照本月天数创建FlSpot列表
-  List<FlSpot> get lineOfWeekSpotList{
+  ///月度趋势--底线--按照本月天数创建FlSpot列表
+  List<FlSpot> get _baseLineOfWeekSpotList{
     int days = daysOfMonth(DateTime.now().millisecondsSinceEpoch);
     if(days == 28){
       return [
@@ -79,8 +82,71 @@ class _LineChartState extends State<MyLineChart> {
     }
   }
 
-  ///年度趋势底线
-  final LineChartBarData lineOfYear = LineChartBarData(
+  ///月度趋势--主线--按照本月天数创建FlSpot列表
+  List<FlSpot> _lineOfWeekSpotList(List<DetailChartItem> list) {
+    int days = daysOfMonth(DateTime.now().millisecondsSinceEpoch);
+    List<double> amount = List.filled(days, 0);
+    int day = 0;
+    for(int i = 0;i < list.length;i++){
+      if(DateTime.fromMillisecondsSinceEpoch(list[i].timeStamp).day == day + 1){
+        amount[day] += list[i].amount;
+      }else{
+        i--;
+        day++;
+        if(day >= days - 1){
+          break;
+        }
+      }
+    }
+    List<FlSpot> flSpot = [
+      FlSpot(1, amount[0]),
+      FlSpot(2, amount[1]),
+      FlSpot(3, amount[2]),
+      FlSpot(4, amount[3]),
+      FlSpot(5, amount[4]),
+      FlSpot(6, amount[5]),
+      FlSpot(7, amount[6]),
+      FlSpot(8, amount[7]),
+      FlSpot(9, amount[8]),
+      FlSpot(10, amount[9]),
+      FlSpot(11, amount[10]),
+      FlSpot(12, amount[11]),
+      FlSpot(13, amount[12]),
+      FlSpot(14, amount[13]),
+      FlSpot(15, amount[14]),
+      FlSpot(16, amount[15]),
+      FlSpot(17, amount[16]),
+      FlSpot(18, amount[17]),
+      FlSpot(19, amount[18]),
+      FlSpot(20, amount[19]),
+      FlSpot(21, amount[20]),
+      FlSpot(22, amount[21]),
+      FlSpot(23, amount[22]),
+      FlSpot(24, amount[23]),
+      FlSpot(25, amount[24]),
+      FlSpot(26, amount[25]),
+      FlSpot(27, amount[26]),
+      FlSpot(28, amount[27]),
+    ];
+    if(days == 28){
+      return flSpot;
+    }else if(days == 29){
+      flSpot.add(FlSpot(29, amount[28]));
+      return flSpot;
+    }else if(days == 30){
+      flSpot.add(FlSpot(29, amount[28]));
+      flSpot.add(FlSpot(30, amount[29]));
+      return flSpot;
+    }else{
+      flSpot.add(FlSpot(29, amount[28]));
+      flSpot.add(FlSpot(30, amount[29]));
+      flSpot.add(FlSpot(31, amount[30]),);
+      return flSpot;
+    }
+  }
+
+  ///年度趋势--底线
+  LineChartBarData get baseLineOfYear => LineChartBarData(
     spots: [
       FlSpot(1, 0),
       FlSpot(2, 0),
@@ -97,19 +163,20 @@ class _LineChartState extends State<MyLineChart> {
     ],
     isCurved: true,
     colors: const [
-      Color(0xffccf2f4),
+      Colors.black54,
     ],
-    barWidth: 2,
-    curveSmoothness: 0.2,
-    isStrokeCapRound: true,
-    dotData: FlDotData(show: true,),
+    barWidth: 1,
+    isStrokeCapRound: false,
+    dotData: FlDotData(
+      show: true,
+    ),
     belowBarData: BarAreaData(
       show: false,
     ),
   );
 
-  ///周趋势底线
-  final LineChartBarData lineOfWeek = LineChartBarData(
+  ///周趋势--底线
+  LineChartBarData get baseLineOfWeek => LineChartBarData(
     spots: [
       FlSpot(1, 0),
       FlSpot(2, 0),
@@ -121,40 +188,144 @@ class _LineChartState extends State<MyLineChart> {
     ],
     isCurved: true,
     colors: const [
-      Color(0xffccf2f4),
+      Colors.black54,
     ],
-    barWidth: 2,
-    curveSmoothness: 0.2,
-    isStrokeCapRound: true,
+    barWidth: 1,
+    isStrokeCapRound: false,
     dotData: FlDotData(show: true,),
     belowBarData: BarAreaData(
       show: false,
     ),
   );
 
-  ///月度趋势底线
-  final LineChartBarData lineOfMonth = LineChartBarData(
-    spots: [
-      FlSpot(1, 0),
-      FlSpot(5, 0),
-      FlSpot(10, 0),
-      FlSpot(15, 0),
-      FlSpot(20, 0),
-      FlSpot(25, 0),
-      FlSpot(30, 0),
-    ],
+  ///月度趋势--底线
+  LineChartBarData get baseLineOfMonth => LineChartBarData(
+    spots: _baseLineOfWeekSpotList,
     isCurved: true,
     colors: const [
-      Color(0xffccf2f4),
+      Colors.black54,
     ],
-    barWidth: 2,
-    curveSmoothness: 0.2,
-    isStrokeCapRound: true,
+    barWidth: 1,
+    isStrokeCapRound: false,
     dotData: FlDotData(show: true,),
     belowBarData: BarAreaData(
       show: false,
     ),
   );
+
+  ///年度趋势--主线
+  LineChartBarData lineOfYear(List<DetailChartItem> list,Color color){
+    if(tabBarIndex == 0 || tabBarIndex == 1){
+      return null;
+    }
+    List<double> amount = [0,0,0,0,0,0,0,0,0,0,0,0];
+    int month = 0;
+    for(int i = 0;i < list.length;i++){
+      if(DateTime.fromMillisecondsSinceEpoch(list[i].timeStamp).month == month + 1){
+        amount[month] += list[i].amount;
+      }else{
+        i--;
+        month++;
+        if(month >= 11){
+          break;
+        }
+      }
+    }
+
+    return LineChartBarData(
+      spots: [
+        FlSpot(1, amount[0]),
+        FlSpot(2, amount[1]),
+        FlSpot(3, amount[2]),
+        FlSpot(4, amount[3]),
+        FlSpot(5, amount[4]),
+        FlSpot(6, amount[5]),
+        FlSpot(7, amount[6]),
+        FlSpot(8, amount[7]),
+        FlSpot(9, amount[8]),
+        FlSpot(10, amount[9]),
+        FlSpot(11, amount[10]),
+        FlSpot(12, amount[11]),
+      ],
+      isCurved: true,
+      colors: [
+        color,
+      ],
+      barWidth: 4,
+      curveSmoothness: 0.4,
+      preventCurveOverShooting: true,
+      isStrokeCapRound: true,
+      dotData: FlDotData(show: false,),
+      belowBarData: BarAreaData(
+        show: false,
+      ),
+    );
+  }
+
+  ///周趋势--主线
+  LineChartBarData lineOfWeek(List<DetailChartItem> list,Color color){
+    if(tabBarIndex == 1 || tabBarIndex == 2){
+      return null;
+    }
+    List<double> amount = [0,0,0,0,0,0,0];
+    int day = 0;
+    for(int i = 0;i < list.length;i++){
+      if(DateTime.fromMillisecondsSinceEpoch(list[i].timeStamp).weekday == day + 1){
+        amount[day] += list[i].amount;
+      }else{
+        i--;
+        day++;
+        if(day >= 6){
+          break;
+        }
+      }
+    }
+    return LineChartBarData(
+      spots: [
+        FlSpot(1, amount[0]),
+        FlSpot(2, amount[1]),
+        FlSpot(3, amount[2]),
+        FlSpot(4, amount[3]),
+        FlSpot(5, amount[4]),
+        FlSpot(6, amount[5]),
+        FlSpot(7, amount[6]),
+      ],
+      isCurved: true,
+      colors: [
+        color,
+      ],
+      barWidth: 4,
+      curveSmoothness: 0.4,
+      preventCurveOverShooting: true,
+      isStrokeCapRound: true,
+      dotData: FlDotData(show: false,),
+      belowBarData: BarAreaData(
+        show: false,
+      ),
+    );
+  }
+
+  ///月度趋势--主线
+  LineChartBarData lineOfMonth(List<DetailChartItem> list,Color color){
+    if(tabBarIndex == 0 || tabBarIndex == 2){
+      return null;
+    }
+    return LineChartBarData(
+      spots: _lineOfWeekSpotList(list),
+      isCurved: true,
+      colors: [
+        color,
+      ],
+      barWidth: 4,
+      curveSmoothness: 0.4,
+      preventCurveOverShooting: true,
+      isStrokeCapRound: true,
+      dotData: FlDotData(show: false,),
+      belowBarData: BarAreaData(
+        show: false,
+      ),
+    );
+  }
 
   ///判断该月有几天
   int daysOfMonth(int timeStamp){
@@ -366,37 +537,8 @@ class _LineChartState extends State<MyLineChart> {
   ///支出趋势线
   List<LineChartBarData> outcomeLine() {
     return [
-      tabBarIndex == 0 ? lineOfWeek : (tabBarIndex == 1 ? lineOfMonth : lineOfYear),
-      LineChartBarData(
-        spots: [
-          FlSpot(1, 1),
-          FlSpot(2, 1.5),
-          FlSpot(3, 1.4),
-          FlSpot(4, 3.4),
-          FlSpot(5, 2),
-          FlSpot(6, 2.2),
-          FlSpot(7, 1),
-          FlSpot(8, 1.5),
-          FlSpot(9, 1.4),
-          FlSpot(10, 3.4),
-          FlSpot(11, 2),
-          FlSpot(12, 2.2),
-        ],
-        isCurved: true,
-        colors: [
-          const Color(0xffccf2f4),
-        ],
-        barWidth: 4,
-        curveSmoothness: 0.4,
-        isStrokeCapRound: true,
-        dotData: FlDotData(
-          show: false,
-        ),
-        belowBarData: BarAreaData(
-          show: false,
-        ),
-      ),
-
+      tabBarIndex == 0 ? baseLineOfWeek : (tabBarIndex == 1 ? baseLineOfMonth : baseLineOfYear),
+      tabBarIndex == 0 ? lineOfWeek(outcomeList,Color(0xffc67ace).withOpacity(0.7)) : (tabBarIndex == 1 ? lineOfMonth(outcomeList,Color(0xffc67ace).withOpacity(0.7)) : lineOfYear(outcomeList,Color(0xffc67ace).withOpacity(0.7))),
     ];
   }
 
@@ -460,34 +602,8 @@ class _LineChartState extends State<MyLineChart> {
   ///收入趋势线
   List<LineChartBarData> incomeLine() {
     return [
-      tabBarIndex == 0 ? lineOfWeek : (tabBarIndex == 1 ? lineOfMonth : lineOfYear),
-      LineChartBarData(
-        spots: [
-          FlSpot(1, 1),
-          FlSpot(2, 4),
-          FlSpot(3, 2.2),
-          FlSpot(4, 3.1),
-          FlSpot(5, 1.6),
-          FlSpot(6, 3.5),
-          FlSpot(7, 4.6),
-          FlSpot(8, 3.1),
-          FlSpot(9, 2.4),
-          FlSpot(10, 1.2),
-          FlSpot(11, 0.4),
-          FlSpot(12, 2.7),
-        ],
-        isCurved: true,
-        colors: const [
-          Color(0x4427b6fc),
-        ],
-        barWidth: 4,
-        curveSmoothness: 0.4,
-        isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(
-          show: false,
-        ),
-      ),
+      tabBarIndex == 0 ? baseLineOfWeek : (tabBarIndex == 1 ? baseLineOfMonth : baseLineOfYear),
+      tabBarIndex == 0 ? lineOfWeek(incomeList,Color(0xfffb3640).withOpacity(0.7)) : (tabBarIndex == 1 ? lineOfMonth(incomeList,Color(0xfffb3640).withOpacity(0.7)) : lineOfYear(incomeList,Color(0xfffb3640).withOpacity(0.7))),
     ];
   }
 

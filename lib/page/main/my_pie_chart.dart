@@ -1,14 +1,20 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:xiao_yu_ji_zhang/logic/app/config/manager.dart';
 import 'package:xiao_yu_ji_zhang/logic/book_keeping/model.dart';
 import 'package:xiao_yu_ji_zhang/ui/ui.dart';
 import 'indicator.dart';
 
 class MyPieChart extends StatefulWidget {
   final int tabBarIndex;
-  final List<DetailChartItem> list;
-  const MyPieChart({Key key, this.tabBarIndex, this.list}) : super(key: key);
+  final List<DetailChartItem> outcomeList;
+  final List<DetailChartItem> incomeList;
+
+  const MyPieChart(
+      {Key key, this.tabBarIndex, this.outcomeList, this.incomeList})
+      : super(key: key);
+
   @override
   State<StatefulWidget> createState() => PieChartSample1State();
 }
@@ -16,15 +22,77 @@ class MyPieChart extends StatefulWidget {
 class PieChartSample1State extends State<MyPieChart> {
   int touchedIndex;
   bool isShowingOutcome;
-  List<DetailChartItem> list;
+  List<DetailChartItem> outcomeList;
+  List<DetailChartItem> incomeList;
   int tabBarIndex;
+  double outcomeAmount;
+  double incomeAmount;
+  List<ChartMainData> outcomeData;
+  List<ChartMainData> incomeData;
+
   @override
   void initState() {
     super.initState();
+    outcomeList = widget.outcomeList;
+    incomeList = widget.incomeList;
     tabBarIndex = widget.tabBarIndex;
     isShowingOutcome = true;
-    list = widget.list;
+    outcomeAmount = _outcomeAmount;
+    incomeAmount = _incomeAmount;
+    outcomeData = dataConversion(outcomeList);
+    incomeData = dataConversion(incomeList);
   }
+
+  ///支出总金额
+  double get _outcomeAmount {
+    if (outcomeList == null || outcomeList.isEmpty) {
+      return 0;
+    }
+    double amount = 0;
+    for (int i = 0; i < outcomeList.length; i++) {
+      amount += outcomeList[i].amount;
+    }
+    return amount;
+  }
+
+  ///收入总金额
+  double get _incomeAmount {
+    if (incomeList == null || incomeList.isEmpty) {
+      return 0;
+    }
+    double amount = 0;
+    for (int i = 0; i < incomeList.length; i++) {
+      amount += incomeList[i].amount;
+    }
+    return amount;
+  }
+
+  ///从列表数据整理出Chart数据
+  List<ChartMainData> dataConversion(List<DetailChartItem> list) {
+    List<ChartMainData> data = [];
+    if (list == null || list.isEmpty) {
+      data.add(ChartMainData(type: "无支出", amount: 0));
+    } else {
+      bool isNewType;
+      data.add(ChartMainData(type: list[0].type, amount: list[0].amount));
+      for (int i = 1; i < list.length; i++) {
+        isNewType = true;
+        for (int j = 0; j < data.length; j++) {
+          if (data[j].type == list[i].type) {
+            data[j].amount += list[i].amount;
+            isNewType = false;
+          }
+        }
+        if (isNewType) {
+          data.add(ChartMainData(type: list[i].type, amount: list[i].amount));
+        }
+      }
+    }
+    data.sort((left, right) => right.amount.compareTo(left.amount));
+    return data;
+  }
+
+  ScrollController itemBarController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -42,86 +110,74 @@ class PieChartSample1State extends State<MyPieChart> {
                 child: Stack(
                   children: [
                     PieChart(
-                        isShowingOutcome
-                            ? PieChartData(
-                                pieTouchData: PieTouchData(
-                                    touchCallback: (pieTouchResponse) {
-                                  setState(() {
-                                    final desiredTouch = pieTouchResponse
-                                            .touchInput is! PointerExitEvent &&
-                                        pieTouchResponse.touchInput
-                                            is! PointerUpEvent;
-                                    if (desiredTouch &&
-                                        pieTouchResponse.touchedSection !=
-                                            null) {
-                                      touchedIndex = pieTouchResponse
-                                          .touchedSection.touchedSectionIndex;
-                                    } else {
-                                      touchedIndex = -1;
-                                    }
-                                  });
-                                }),
-                                startDegreeOffset: 100,
-                                borderData: FlBorderData(
-                                  show: false,
-                                ),
-                                sectionsSpace: 8,
-                                centerSpaceRadius: 50,
-                                sections: outcomeChart())
-                            : PieChartData(
-                                pieTouchData: PieTouchData(
-                                    touchCallback: (pieTouchResponse) {
-                                  setState(() {
-                                    final desiredTouch = pieTouchResponse
-                                            .touchInput is! PointerExitEvent &&
-                                        pieTouchResponse.touchInput
-                                            is! PointerUpEvent;
-                                    if (desiredTouch &&
-                                        pieTouchResponse.touchedSection !=
-                                            null) {
-                                      touchedIndex = pieTouchResponse
-                                          .touchedSection.touchedSectionIndex;
-                                    } else {
-                                      touchedIndex = -1;
-                                    }
-                                  });
-                                }),
-                                startDegreeOffset: -160,
-                                borderData: FlBorderData(
-                                  show: false,
-                                ),
-                                sectionsSpace: 8,
-                                centerSpaceRadius: 50,
-                                sections: incomeChart()),
+                        PieChartData(
+                            pieTouchData:
+                                PieTouchData(touchCallback: (pieTouchResponse) {
+                              setState(() {
+                                final desiredTouch = pieTouchResponse.touchInput
+                                        is! PointerExitEvent &&
+                                    pieTouchResponse.touchInput
+                                        is! PointerUpEvent;
+                                if (desiredTouch &&
+                                    pieTouchResponse.touchedSection != null) {
+                                  touchedIndex = pieTouchResponse
+                                      .touchedSection.touchedSectionIndex;
+                                } else {
+                                  touchedIndex = -1;
+                                }
+                                // itemBarController.jumpTo();
+                              });
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              double _position;
+                              if(touchedIndex <= 3){
+                                _position = 0;
+                              }else{
+                                _position = (touchedIndex - 3).toDouble() * 50 ;
+                              }
+
+                              if(touchedIndex != -1){
+                                itemBarController.animateTo(_position,
+                                    duration: Duration(milliseconds: 250), curve: Curves.linear);
+                              }
+                            });
+                            }),
+                            startDegreeOffset: isShowingOutcome ? 180 : -180,
+                            borderData: FlBorderData(
+                              show: false,
+                            ),
+                            sectionsSpace: 8,
+                            centerSpaceRadius: 50,
+                            sections: isShowingOutcome
+                                ? outcomeChart()
+                                : incomeChart()),
                         swapAnimationDuration:
                             const Duration(milliseconds: 250)),
                     Center(
-                        child: TextButton(
-                            onPressed: () {
-                            //TODO
-                              setState(() {
-                             isShowingOutcome = !isShowingOutcome;
-                              });
-                             print("1");
-                             },
+                        child: TextButton(onPressed: () {
+                           setState(() {
+                              isShowingOutcome = !isShowingOutcome;
+                            });
+                            },
                              child: Container(
-                              height: 50,
-                              width: 50,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                 children: [
-                                     Icon(
-                                        Icons.wifi_protected_setup_outlined,
-                                      color: Colors.lightBlueAccent,
-                                      size: 15,
-                                      ),
-                                    Text(
-                                  isShowingOutcome ? "支出" : "收入",
-                                  style: TextStyle(
-                                      color: Colors.lightBlueAccent,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,),
-                                )
+                                   height: 50,
+                                    width: 50,
+                                    child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.wifi_protected_setup_outlined,
+                                          color: Colors.lightBlueAccent,
+                                          size: 15,
+                                        ),
+                                        Text(
+                                          isShowingOutcome ? "支出" : "收入",
+                                          style: TextStyle(
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.lightBlueAccent,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                            )
                           ],
                         ),
                       ),
@@ -140,7 +196,9 @@ class PieChartSample1State extends State<MyPieChart> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  isShowingOutcome ? "支出: 15215.2(元)" : "收入: 15215.2(元)",
+                  isShowingOutcome
+                      ? "支出: $outcomeAmount(元)"
+                      : "收入: $incomeAmount(元)",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -148,37 +206,18 @@ class PieChartSample1State extends State<MyPieChart> {
                   ),
                   maxLines: 1,
                 ),
-                Indicator(
-                  color: touchedIndex == 0
-                      ? Color(0xff0293ee)
-                      : Color(0xff0293ee).withOpacity(0.6),
-                  text: '餐饮: 24%',
-                  size: touchedIndex == 0 ? 18 : 16,
-                  textColor: touchedIndex == 0 ? Colors.black : Colors.grey,
-                ),
-                Indicator(
-                  color: touchedIndex == 1
-                      ? Color(0xfff8b250)
-                      : Color(0xfff8b250).withOpacity(0.6),
-                  text: '娱乐',
-                  size: touchedIndex == 1 ? 18 : 16,
-                  textColor: touchedIndex == 1 ? Colors.black : Colors.grey,
-                ),
-                Indicator(
-                  color: touchedIndex == 2
-                      ? Color(0xff845bef)
-                      : Color(0xff845bef).withOpacity(0.6),
-                  text: '购物',
-                  size: touchedIndex == 2 ? 18 : 16,
-                  textColor: touchedIndex == 2 ? Colors.black : Colors.grey,
-                ),
-                Indicator(
-                  color: touchedIndex == 3
-                      ? Color(0xff13d38e)
-                      : Color(0xff13d38e).withOpacity(0.6),
-                  text: '其他',
-                  size: touchedIndex == 3 ? 18 : 16,
-                  textColor: touchedIndex == 3 ? Colors.black : Colors.grey,
+                Container(
+                  width: 130,
+                  height: 200,
+                  child: Scrollbar(
+                      child: ListView.builder(
+                    controller: itemBarController,
+                    physics: BouncingScrollPhysics(),
+                    itemCount: isShowingOutcome
+                        ? outcomeData.length
+                        : incomeData.length,
+                    itemBuilder: itemBuilder,
+                  )),
                 ),
                 SizedBox(
                   height: 16,
@@ -192,70 +231,165 @@ class PieChartSample1State extends State<MyPieChart> {
   }
 
   List<PieChartSectionData> outcomeChart() {
+    if(outcomeAmount == 0){
+      final isTouched = 0 == touchedIndex;
+      final double opacity = isTouched ? 1 : 0.6;
+      return [PieChartSectionData(
+        color: Colors.grey.withOpacity(opacity),
+        value:100,
+        title: "无支出",
+        radius: 40,
+        titleStyle: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.white),
+        titlePositionPercentageOffset: 0.55,
+      )];
+    }
     return List.generate(
-      5,
+      outcomeData.length,
       (i) {
         final isTouched = i == touchedIndex;
         final double opacity = isTouched ? 1 : 0.6;
-        switch (i) {
-          case 0:
+        switch (outcomeData[i].type) {
+          case "餐饮":
             return PieChartSectionData(
-              color: Color(0xff0293ee).withOpacity(opacity),
-              value: 25,
-              title: '',
+              color: Color(AlternativeColors.colorList[0]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '餐饮',
               radius: 40,
               titleStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff044d7c)),
+                  color: Colors.white),
+              titlePositionPercentageOffset: 0.5,
+            );
+          case "购物":
+            return PieChartSectionData(
+              color: Color(AlternativeColors.colorList[1]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '购物',
+              radius: 40,
+              titleStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
               titlePositionPercentageOffset: 0.55,
             );
-          case 1:
+          case "交通":
             return PieChartSectionData(
-              color: Color(0xfff8b250).withOpacity(opacity),
-              value: 25,
-              title: '',
+              color: Color(AlternativeColors.colorList[2]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '交通',
               radius: 40,
               titleStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff90672d)),
-              titlePositionPercentageOffset: 0.55,
-            );
-          case 2:
-            return PieChartSectionData(
-              color: Color(0xff845bef).withOpacity(opacity),
-              value: 25,
-              title: '',
-              radius: 40,
-              titleStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xff4c3788)),
+                  color: Colors.white),
               titlePositionPercentageOffset: 0.6,
             );
-          case 3:
+          case "娱乐":
             return PieChartSectionData(
-              color: Color(0xff13d38e).withOpacity(opacity),
-              value: 25,
-              title: '',
+              color: Color(AlternativeColors.colorList[3]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '娱乐',
               radius: 40,
               titleStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff0c7f55)),
+                  color: Colors.white),
               titlePositionPercentageOffset: 0.55,
             );
-          case 4:
+          case "理财":
             return PieChartSectionData(
-              color: const Color(0xff53d385).withOpacity(opacity),
-              value: 25,
-              title: '',
+              color: Color(AlternativeColors.colorList[4]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '理财',
               radius: 40,
               titleStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff0c7f55)),
+                  color: Colors.white),
+              titlePositionPercentageOffset: 0.55,
+            );
+          case "旅行":
+            return PieChartSectionData(
+              color: Color(AlternativeColors.colorList[5]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '旅行',
+              radius: 40,
+              titleStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+              titlePositionPercentageOffset: 0.55,
+            );
+          case "医疗":
+            return PieChartSectionData(
+              color: Color(AlternativeColors.colorList[6]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '医疗',
+              radius: 40,
+              titleStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+              titlePositionPercentageOffset: 0.55,
+            );
+          case "礼金":
+            return PieChartSectionData(
+              color: Color(AlternativeColors.colorList[7]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '礼金',
+              radius: 40,
+              titleStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+              titlePositionPercentageOffset: 0.55,
+            );
+          case "美容":
+            return PieChartSectionData(
+              color: Color(AlternativeColors.colorList[8]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '美容',
+              radius: 40,
+              titleStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+              titlePositionPercentageOffset: 0.55,
+            );
+          case "其他":
+            return PieChartSectionData(
+              color: Color(AlternativeColors.colorList[9]).withOpacity(opacity),
+              value: outcomeData[i].amount < outcomeAmount / 20
+                  ? outcomeAmount / 20
+                  : outcomeData[i].amount,
+              title: outcomeData[i].amount < outcomeAmount / 15 ? "..." : '其他',
+              radius: 40,
+              titleStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
               titlePositionPercentageOffset: 0.55,
             );
           default:
@@ -266,70 +400,99 @@ class PieChartSample1State extends State<MyPieChart> {
   }
 
   List<PieChartSectionData> incomeChart() {
+    if(incomeAmount == 0){
+      final isTouched = 0 == touchedIndex;
+      final double opacity = isTouched ? 1 : 0.6;
+      return [PieChartSectionData(
+        color: Colors.grey.withOpacity(opacity),
+        value:100,
+        title: "无收入",
+        radius: 40,
+        titleStyle: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.white),
+        titlePositionPercentageOffset: 0.55,
+      )];
+    }
     return List.generate(
-      4,
+      incomeData.length,
       (i) {
         final isTouched = i == touchedIndex;
         final double opacity = isTouched ? 1 : 0.6;
-        switch (i) {
-          case 0:
+        switch (incomeData[i].type) {
+          case "工资":
             return PieChartSectionData(
-              color: Color(0xff0293ee).withOpacity(opacity),
-              value: 25,
-              title: '',
+              color: Color(AlternativeColors.colorList[9]).withOpacity(opacity),
+              value: incomeData[i].amount < incomeAmount / 20
+                  ? incomeAmount / 20
+                  : incomeData[i].amount,
+              title: incomeData[i].amount < incomeAmount / 15 ? "..." : '工资',
               radius: 40,
               titleStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff044d7c)),
+                  color: Colors.white),
               titlePositionPercentageOffset: 0.55,
             );
-          case 1:
+          case "奖金":
             return PieChartSectionData(
-              color: Color(0xfff8b250).withOpacity(opacity),
-              value: 25,
-              title: '',
+              color:
+                  Color(AlternativeColors.colorList[10]).withOpacity(opacity),
+              value: incomeData[i].amount < incomeAmount / 20
+                  ? incomeAmount / 20
+                  : incomeData[i].amount,
+              title: incomeData[i].amount < incomeAmount / 15 ? "..." : '奖金',
               radius: 40,
               titleStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff90672d)),
+                  color: Colors.white),
               titlePositionPercentageOffset: 0.55,
             );
-          case 2:
+          case "兼职":
             return PieChartSectionData(
-              color: Color(0xff845bef).withOpacity(opacity),
-              value: 25,
-              title: '',
+              color:
+                  Color(AlternativeColors.colorList[11]).withOpacity(opacity),
+              value: incomeData[i].amount < incomeAmount / 20
+                  ? incomeAmount / 20
+                  : incomeData[i].amount,
+              title: incomeData[i].amount < incomeAmount / 15 ? "..." : '兼职',
               radius: 40,
               titleStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff4c3788)),
+                  color: Colors.white),
               titlePositionPercentageOffset: 0.6,
             );
-          case 3:
+          case "投资收益":
             return PieChartSectionData(
-              color: Color(0xff13d38e).withOpacity(opacity),
-              value: 25,
-              title: '',
+              color:
+                  Color(AlternativeColors.colorList[12]).withOpacity(opacity),
+              value: incomeData[i].amount < incomeAmount / 20
+                  ? incomeAmount / 20
+                  : incomeData[i].amount,
+              title: incomeData[i].amount < incomeAmount / 15 ? "..." : '投资',
               radius: 40,
               titleStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff0c7f55)),
+                  color: Colors.white),
               titlePositionPercentageOffset: 0.55,
             );
-          case 4:
+          case "其他":
             return PieChartSectionData(
-              color: const Color(0xff53d385).withOpacity(opacity),
-              value: 25,
-              title: '',
+              color:
+                  Color(AlternativeColors.colorList[13]).withOpacity(opacity),
+              value: incomeData[i].amount < incomeAmount / 20
+                  ? incomeAmount / 20
+                  : incomeData[i].amount,
+              title: incomeData[i].amount < incomeAmount / 15 ? "..." : '其他',
               radius: 40,
               titleStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff0c7f55)),
+                  color: Colors.white),
               titlePositionPercentageOffset: 0.55,
             );
           default:
@@ -338,4 +501,64 @@ class PieChartSample1State extends State<MyPieChart> {
       },
     );
   }
+
+  Widget itemBuilder(BuildContext context, int index) {
+    String type =
+        (isShowingOutcome ? outcomeData[index].type : incomeData[index].type);
+    String ratio = (((isShowingOutcome
+                    ? outcomeData[index].amount
+                    : incomeData[index].amount) /
+                (isShowingOutcome ? outcomeAmount : incomeAmount)) *
+            100)
+        .toStringAsPrecision(3);
+    return Container(
+      height: 50,
+      child: Indicator(
+        color: touchedIndex == index
+            ? (isShowingOutcome
+                ? typeColor(outcomeData[index].type)
+                : typeColor(incomeData[index].type))
+            : (isShowingOutcome
+                    ? typeColor(outcomeData[index].type)
+                    : typeColor(incomeData[index].type))
+                .withOpacity(0.6),
+        text: ("投资收益" == type ? "投资" : type) + ("无支出" == type ? "" : ": " + ratio + "%"),
+        size: touchedIndex == index ? 18 : 16,
+        textColor: touchedIndex == index ? Colors.black54 : Colors.grey,
+      ),
+    );
+  }
+
+  Color typeColor(String type) {
+    for (int i = 0;
+        i <
+            AppConfigManager
+                .instance.incomeConfig.bookKeepingButtonConfig.length;
+        i++) {
+      if (type ==
+          AppConfigManager
+              .instance.incomeConfig.bookKeepingButtonConfig[i].type) {
+        return Color(AlternativeColors.colorList[i + 9]);
+      }
+    }
+    for (int i = 0;
+        i <
+            AppConfigManager
+                .instance.outcomeConfig.bookKeepingButtonConfig.length;
+        i++) {
+      if (type ==
+          AppConfigManager
+              .instance.outcomeConfig.bookKeepingButtonConfig[i].type) {
+        return Color(AlternativeColors.colorList[i]);
+      }
+    }
+    return Colors.grey;
+  }
+}
+
+class ChartMainData {
+  String type;
+  double amount;
+
+  ChartMainData({this.type, this.amount});
 }
