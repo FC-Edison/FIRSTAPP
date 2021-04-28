@@ -176,6 +176,7 @@ class PieChartSample1State extends State<MyPieChart> {
                                             color: Colors.lightBlueAccent,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 12,
+                                            decoration: TextDecoration.underline
                                           ),
                             )
                           ],

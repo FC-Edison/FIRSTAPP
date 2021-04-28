@@ -79,14 +79,16 @@ class MyBarChartState extends State<MyBarChart> {
                         child: Row(
                           children: [
                             Text(
-                              '支出: ',
+                              '支出:',
                               style: TextStyle(
                                 fontStyle: FontStyle.italic,
                                 color: Colors.lightBlueAccent,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12,),
+                                fontSize: 12,
+                                decoration: TextDecoration.underline),
                               textAlign: TextAlign.center,
                             ),
+                            Text(" "),
                             Container(
                                 height: 15,
                                 width: 15,
@@ -105,14 +107,16 @@ class MyBarChartState extends State<MyBarChart> {
                         child: Row(
                           children: [
                             Text(
-                              '收入: ',
+                              '收入:',
                               style: TextStyle(
                                 fontStyle: FontStyle.italic,
                                 color: Colors.lightBlueAccent,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12,),
+                                fontSize: 12,
+                                decoration: TextDecoration.underline),
                               textAlign: TextAlign.center,
                             ),
+                            Text(" "),
                             Container(
                                 height: 15,
                                 width: 15,
